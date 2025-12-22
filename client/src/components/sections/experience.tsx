@@ -4,6 +4,17 @@ import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 const experiences = [
   {
     title: "Software Engineer",
+    company: "Lexsy.ai",
+    period: "July 2025 - Present",
+    description: [
+      "Building and scaling a legal-tech automation platform with a microservices architecture (Node.js, Express, PostgreSQL, Docker, Temporal).",
+      "Developed secure, role-based client and lawyer workflows, enabling automated compliance document generation (Stripe, DocuSign, Dropbox integrations).",
+      "Designed RESTful APIs and inter-service communication protocols to streamline onboarding, engagement agreements, and regulatory filings.",
+      "Improved front-end experience by implementing responsive React/Next.js components with real-time workflow tracking."
+    ]
+  },
+  {
+    title: "Software Engineer",
     company: "University of Maryland Baltimore County",
     period: "Aug 2024 - May 2025",
     description: [
@@ -11,8 +22,7 @@ const experiences = [
       "Built React and TypeScript front end with Redux and Google Maps, mobile loads under one second for more than two thousand users.",
       "Designed REST and GraphQL APIs with Node.js, Express, PostgreSQL, implemented JWT role-based auth, and sustained about 3000 reservation requests per day with an error rate under one percent.",
       "Containerised services in Docker and wired a GitHub Actions CI/CD pipeline for blue-green deployments on AWS EC2 and RDS, added OpenTelemetry and Grafana monitoring that cut average API latency from 450 ms to 180 ms."
-    ],
-    color: "electric-blue"
+    ]
   },
   {
     title: "Full Stack Developer",
@@ -23,68 +33,74 @@ const experiences = [
       "Developed secure APIs in Node.js for patient scheduling and reports, using JWT/OAuth for login and data protection.",
       "Containerized the app using Docker, and worked on Kubernetes deployment with auto-scaling and smooth updates.",
       "Added an AI-powered feature that suggests diagnosis codes using a BERT model, reducing manual work for doctors by 22%."
-    ],
-    color: "deep-purple"
-  },
-  // {
-  //   title: "Software Developer",
-  //   company: "IDS",
-  //   period: "June 2021 - May 2022",
-  //   description: [
-  //     "Contributed to building EchoLens, an AI-driven meeting assistant using FastAPI, Celery, and HuggingFace (T5, BART) to summarize transcripts and extract action items from audio.",
-  //     "Integrated AssemblyAI for transcription and speaker diarization, storing audio in AWS S3 and processed data in DynamoDB, with scalable deployment via Docker on AWS EC2.",
-  //     "Developed the frontend with React.js, Tailwind CSS, and Web Audio API for synced playback and transcript highlights.",
-  //     "Implemented Slack and Google Calendar APIs and used JWT Auth to automate follow-ups and built CI/CD using GitHub Actions."
-  //   ],
-  //   color: "electric-blue"
-  // }
+    ]
+  }
 ];
 
 export function ExperienceSection() {
   const { ref, isIntersecting } = useIntersectionObserver();
 
   return (
-    <section id="experience" className="py-20 px-6" ref={ref}>
+    <section id="experience" className="py-24 px-6 bg-secondary/20" ref={ref}>
       <div className="container mx-auto max-w-4xl">
-        <motion.h2 
-          className="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text"
-          initial={{ opacity: 0, y: 30 }}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={isIntersecting ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
         >
-          Work Experience
-        </motion.h2>
-        
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Professional Experience
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            My journey in software engineering and cloud architecture
+          </p>
+        </motion.div>
+
         <div className="relative">
-          {/* Timeline Line */}
-          <div className="absolute left-8 md:left-1/2 transform md:-translate-x-1/2 h-full w-1 gradient-bg"></div>
-          
-          {/* Experience Items */}
+          {/* Vertical Line */}
+          <div className="absolute left-[19px] top-4 bottom-0 w-[2px] bg-border md:left-1/2 md:-ml-[1px]"></div>
+
           <div className="space-y-12">
             {experiences.map((exp, index) => (
-              <motion.div 
+              <motion.div
                 key={index}
-                className="relative flex items-center"
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                animate={isIntersecting ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: index * 0.3 }}
+                className={`relative flex flex-col md:flex-row gap-8 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''
+                  }`}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isIntersecting ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
               >
-                <div className={`absolute left-6 md:left-1/2 transform md:-translate-x-1/2 w-5 h-5 bg-[hsl(var(--${exp.color}))] rounded-full border-4 border-[#0A0A0A]`}></div>
-                <div className={`ml-16 md:ml-0 ${index % 2 === 0 ? 'md:w-1/2 md:pr-8' : 'md:w-1/2 md:ml-auto md:pl-8'}`}>
-                  <div className="glass p-6 rounded-xl">
-                    <h3 className="text-xl font-semibold mb-2">{exp.title}</h3>
-                    <p className={`text-[hsl(var(--${exp.color}))] mb-2`}>{exp.company}</p>
-                    <p className="text-gray-400 text-sm mb-4">{exp.period}</p>
-                    <ul className="text-gray-300 space-y-2">
+                {/* Timeline Dot */}
+                <div className="absolute left-0 top-1.5 w-10 h-10 rounded-full border-[3px] border-background bg-primary z-10 md:left-1/2 md:-ml-5 flex items-center justify-center shadow-md">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                </div>
+
+                {/* Content Card */}
+                <div className="ml-16 md:ml-0 md:w-[calc(50%-40px)]">
+                  <div className="bg-card p-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
+                    <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
+                      {exp.period}
+                    </span>
+                    <h3 className="text-xl font-bold text-foreground mb-1">
+                      {exp.title}
+                    </h3>
+                    <p className="text-base font-medium text-muted-foreground mb-4">
+                      {exp.company}
+                    </p>
+                    <ul className="space-y-3">
                       {exp.description.map((item, i) => (
-                        <li key={i} className="flex items-start">
-                          <span className="text-[hsl(var(--${exp.color}))] mr-2">•</span>
+                        <li key={i} className="flex items-start text-sm text-foreground/80 leading-relaxed">
+                          <span className="mr-2.5 mt-1.5 w-1.5 h-1.5 bg-primary rounded-full shrink-0"></span>
                           <span>{item}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 </div>
+
+                {/* Empty space for the other side */}
+                <div className="hidden md:block md:w-[calc(50%-40px)]"></div>
               </motion.div>
             ))}
           </div>

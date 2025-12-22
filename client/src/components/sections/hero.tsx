@@ -1,113 +1,112 @@
 import { motion } from "framer-motion";
 import profileImage from '@/assets/profile.jpeg';
-import profileImage1 from '@/assets/profile2.jpeg';
-import { useState } from 'react';
 import { FaFileAlt, FaLinkedin, FaGithub } from 'react-icons/fa';
 
 export function HeroSection() {
 
-  const [isHovered, setIsHovered] = useState(false);
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden py-20">
-      {/* Modern workspace background */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080" 
-          alt="Modern developer workspace" 
-          className="w-full h-full object-cover opacity-20" 
-        />
-      </div>
-      
-      <div className="relative z-10 container mx-auto px-6 max-w-6xl">
-        <div className="flex flex-col md:grid md:grid-cols-2 gap-12 items-center">
+    <section id="home" className="min-h-[90vh] flex items-center justify-center py-20 bg-background relative overflow-hidden">
+      {/* Background Gradient Spot - subtle */}
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="container mx-auto px-6 max-w-6xl relative z-10">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left side - Text content */}
-          <motion.div 
-            className="text-left order-2 md:order-1"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
+          <motion.div
+            className="text-left"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 animate-fadeIn">
-              Hi, I'm <span className="gradient-text">Vishwanth</span>
-            </h1>
-            <motion.p 
-              className="text-lg sm:text-xl md:text-2xl mb-8 text-gray-300"
+            {/* Title */}
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-8"
             >
-              Software Engineer
+              <p className="text-lg text-muted-foreground mb-4 font-medium tracking-wide">Hello, I'm</p>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground mb-4 tracking-tight">
+                Vishwanth <span className="text-primary">Reddy</span>
+              </h1>
+              <h2 className="text-2xl sm:text-3xl font-medium text-foreground/80 mb-6">
+                Software Engineer
+              </h2>
+            </motion.div>
+
+            {/* Description */}
+            <motion.p
+              className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              Focused on building scalable web applications and integrating AI to create smarter, more intuitive user experiences. Skilled across the full stack — from crafting responsive frontends to designing robust backend systems and deploying them in the cloud.
             </motion.p>
-            <motion.p 
-              className="text-base sm:text-lg mb-12 text-white bg-gradient-to-r from-[#2a2a72]/50 to-[#009ffd]/50 p-4 sm:p-6 rounded-xl border border-white/20 shadow-lg"
+
+            {/* CTA Buttons */}
+            <motion.div
+              className="flex flex-wrap gap-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.8 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
             >
-              Focused on building scalable web applications and integrating AI to create smarter, more intuitive user experiences. Skilled across the full stack — from crafting responsive frontends to designing robust backend systems and deploying them in the cloud. Passionate about clean code, practical solutions, and constantly learning new ways to push technology forward.
-            </motion.p>
-            
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9, duration: 0.8 }}
-            >
-              <a 
-                href="https://vishwaj1.github.io/docs/VishwanthReddy.pdf" 
-                target="_blank" 
+              <a
+                href={`${import.meta.env.BASE_URL}VishwanthReddyJakka_SoftwareEngineer.pdf`}
+                target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 sm:px-8 py-3 sm:py-4 gradient-bg text-white font-semibold rounded-full hover:scale-105 transition-all duration-300 animate-glow flex items-center gap-2"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
               >
-                <FaFileAlt className="text-xl" />
-                Resume
+                <FaFileAlt />
+                <span>View Resume</span>
               </a>
-              <a 
-                href="http://linkedin.com/in/jvvr/" 
-                target="_blank" 
+
+              <a
+                href="http://linkedin.com/in/jvvr/"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 sm:px-8 py-3 sm:py-4 glass text-white font-semibold rounded-full hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
+                className="inline-flex items-center gap-2 px-6 py-3 border border-border bg-background hover:bg-accent hover:text-accent-foreground text-foreground font-medium rounded-lg transition-all hover:-translate-y-0.5"
               >
-                <FaLinkedin className="text-xl" />
-                LinkedIn
+                <FaLinkedin />
+                <span>LinkedIn</span>
               </a>
-              <a 
-                href="https://github.com/vishwaj1" 
-                target="_blank" 
+
+              <a
+                href="https://github.com/vishwaj1"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 sm:px-8 py-3 sm:py-4 glass text-white font-semibold rounded-full hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
+                className="inline-flex items-center gap-2 px-6 py-3 border border-border bg-background hover:bg-accent hover:text-accent-foreground text-foreground font-medium rounded-lg transition-all hover:-translate-y-0.5"
               >
-                <FaGithub className="text-xl" />
-                GitHub
+                <FaGithub />
+                <span>GitHub</span>
               </a>
             </motion.div>
           </motion.div>
 
-          {/* Right side - Photo */}
+          {/* Right side - Profile Image */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="relative order-1 md:order-2 mb-8 md:mb-0"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="relative flex justify-center lg:justify-end"
           >
-            <div className="relative w-full max-w-[280px] sm:max-w-md mx-auto">
-              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--electric-blue))] to-[hsl(var(--neon-purple))] rounded-2xl blur-xl opacity-30"></div>
-              <img 
-                src={isHovered ? profileImage : profileImage1} 
-                alt="Vishwanth Reddy Jakka" 
-                className="relative rounded-2xl shadow-2xl w-full aspect-square object-cover"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-              />
+            <div className="relative w-full max-w-md group">
+              {/* Abstract decorative elements */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Image Container */}
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-card border border-border/50">
+                <img
+                  src={profileImage}
+                  alt="Vishwanth Reddy Jakka"
+                  className="w-full aspect-square object-cover transition-transform duration-700 hover:scale-105"
+                />
+              </div>
             </div>
           </motion.div>
         </div>
       </div>
-      
-      {/* Floating Elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 glass rounded-full animate-float opacity-60"></div>
-      <div className="absolute bottom-20 right-10 w-16 h-16 glass rounded-full animate-float opacity-40" style={{animationDelay: '2s'}}></div>
-      <div className="absolute top-1/2 left-20 w-12 h-12 glass rounded-full animate-float opacity-30" style={{animationDelay: '4s'}}></div>
     </section>
   );
 }

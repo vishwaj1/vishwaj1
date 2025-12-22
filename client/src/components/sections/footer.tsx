@@ -1,8 +1,10 @@
 export function Footer() {
   return (
-    <footer className="py-8 px-6 border-t border-gray-800">
+    <footer className="py-8 px-6 border-t border-border bg-background">
       <div className="container mx-auto text-center">
-        <p className="text-gray-400">© 2025 Vishwanth. From idea to execution - one commit at a time.</p>
+        <p className="text-muted-foreground text-sm">
+          © {new Date().getFullYear()} Vishwanth Reddy. Built with React & Tailwind CSS.
+        </p>
       </div>
     </footer>
   );

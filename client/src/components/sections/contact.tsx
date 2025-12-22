@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { insertContactSchema } from "@shared/schema";
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub, FaLinkedin, FaTwitter, FaPaperPlane, FaSpinner } from 'react-icons/fa';
 
 export function ContactSection() {
   const { ref, isIntersecting } = useIntersectionObserver();
@@ -57,78 +58,104 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 px-6 bg-[#111111]" ref={ref}>
+    <section id="contact" className="py-24 px-6 bg-secondary/20" ref={ref}>
       <div className="container mx-auto max-w-4xl">
-        <motion.h2 
-          className="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text"
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isIntersecting ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
         >
-          Get In Touch
-        </motion.h2>
-        
-        <div className="grid md:grid-cols-2 gap-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Get In Touch
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Let's discuss your next project or opportunity
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Contact Info */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             animate={isIntersecting ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="space-y-8"
           >
-            <h3 className="text-2xl font-semibold mb-6">Let's Build Something Meaningful</h3>
-            <p className="text-gray-300 mb-8 leading-relaxed">
-            As a software engineer, I enjoy creating full-stack applications, automating workflows, and integrating AI to solve real-world problems. Whether you're building scalable systems, streamlining backend services, or exploring smarter ways to work with data, I'd love to connect and collaborate!
-            </p>
-            
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center space-x-4">
-                <i className="fas fa-envelope text-[hsl(var(--electric-blue))] text-xl"></i>
-                <span>vishwanthreddy2601@gmail.com</span>
+            <div>
+              <h3 className="text-2xl font-bold text-foreground mb-4">Let's Connect</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                As a software engineer, I enjoy creating full-stack applications, automating workflows, and integrating AI to solve real-world problems. Whether you're building scalable systems, streamlining backend services, or exploring smarter ways to work with data, I'd love to connect!
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4 p-4 bg-background rounded-xl border border-border shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <FaEnvelope size={18} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Email</p>
+                  <p className="text-foreground font-medium">vishwanthreddy2601@gmail.com</p>
+                </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <i className="fas fa-phone text-[hsl(var(--electric-blue))] text-xl"></i>
-                <span>+14439922881</span>
+
+              <div className="flex items-center space-x-4 p-4 bg-background rounded-xl border border-border shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <FaPhone size={18} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Phone</p>
+                  <p className="text-foreground font-medium">+14439922881</p>
+                </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <i className="fas fa-map-marker-alt text-[hsl(var(--electric-blue))] text-xl"></i>
-                <span>Charlotte, NC</span>
+
+              <div className="flex items-center space-x-4 p-4 bg-background rounded-xl border border-border shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <FaMapMarkerAlt size={18} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Location</p>
+                  <p className="text-foreground font-medium">Charlotte, NC</p>
+                </div>
               </div>
             </div>
-            
+
             {/* Social Links */}
-            <div className="flex space-x-6">
-              <a 
-                href="https://github.com/vishwaj1" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-2xl hover:text-[hsl(var(--electric-blue))] transition-colors"
+            <div className="flex space-x-4 pt-4">
+              <a
+                href="https://github.com/vishwaj1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-background border border-border text-muted-foreground hover:text-primary hover:border-primary transition-all shadow-sm hover:shadow-md"
               >
-                <i className="fab fa-github"></i>
+                <FaGithub size={20} />
               </a>
-              <a 
-                href="https://www.linkedin.com/in/jvvr/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-2xl hover:text-[hsl(var(--electric-blue))] transition-colors"
+              <a
+                href="https://www.linkedin.com/in/jvvr/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-background border border-border text-muted-foreground hover:text-primary hover:border-primary transition-all shadow-sm hover:shadow-md"
               >
-                <i className="fab fa-linkedin"></i>
+                <FaLinkedin size={20} />
               </a>
-              <a 
-                href="#" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-2xl hover:text-[hsl(var(--electric-blue))] transition-colors"
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-background border border-border text-muted-foreground hover:text-primary hover:border-primary transition-all shadow-sm hover:shadow-md"
               >
-                <i className="fab fa-twitter"></i>
+                <FaTwitter size={20} />
               </a>
             </div>
           </motion.div>
-          
+
           {/* Contact Form */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 30 }}
             animate={isIntersecting ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="bg-card p-8 rounded-2xl border border-border shadow-sm"
           >
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -137,89 +164,89 @@ export function ContactSection() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Name</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Your name" 
-                          className="glass border-0 text-white placeholder-gray-400 focus:ring-2 focus:ring-[hsl(var(--electric-blue))]"
-                          {...field} 
+                        <Input
+                          placeholder="Your name"
+                          className="bg-background border-input text-foreground focus:ring-primary focus:border-primary"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Email</FormLabel>
                       <FormControl>
-                        <Input 
+                        <Input
                           type="email"
-                          placeholder="your.email@example.com" 
-                          className="glass border-0 text-white placeholder-gray-400 focus:ring-2 focus:ring-[hsl(var(--electric-blue))]"
-                          {...field} 
+                          placeholder="your.email@example.com"
+                          className="bg-background border-input text-foreground focus:ring-primary focus:border-primary"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="company"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company (Optional)</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Company (Optional)</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Your company" 
-                          className="glass border-0 text-white placeholder-gray-400 focus:ring-2 focus:ring-[hsl(var(--electric-blue))]"
-                          {...field} 
+                        <Input
+                          placeholder="Your company"
+                          className="bg-background border-input text-foreground focus:ring-primary focus:border-primary"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Message</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Message</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Textarea
                           rows={4}
-                          placeholder="Tell me about your project..." 
-                          className="glass border-0 text-white placeholder-gray-400 focus:ring-2 focus:ring-[hsl(var(--electric-blue))] resize-none"
-                          {...field} 
+                          placeholder="Tell me about your project..."
+                          className="bg-background border-input text-foreground focus:ring-primary focus:border-primary resize-none"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
-                <Button 
-                  type="submit" 
+
+                <Button
+                  type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-4 gradient-bg text-white font-semibold rounded-lg hover:scale-105 transition-all duration-300 animate-glow"
+                  className="w-full py-6 text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
                 >
                   {isSubmitting ? (
                     <>
-                      <i className="fas fa-spinner fa-spin mr-2"></i>
+                      <FaSpinner className="animate-spin mr-2" />
                       Sending...
                     </>
                   ) : (
                     <>
                       <span>Send Message</span>
-                      <i className="fas fa-paper-plane ml-2"></i>
+                      <FaPaperPlane className="ml-2" />
                     </>
                   )}
                 </Button>
