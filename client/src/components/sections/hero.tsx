@@ -1,8 +1,34 @@
 import { motion } from "framer-motion";
 import profileImage from '@/assets/profile.jpeg';
-import { FaFileAlt, FaLinkedin, FaGithub } from 'react-icons/fa';
+import { FaFileAlt, FaLinkedin, FaGithub, FaCalendarAlt } from 'react-icons/fa';
+
+import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 export function HeroSection() {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      toast({
+        title: "Let's Connect! 👋",
+        description: "Schedule a chat with me!",
+        action: (
+          <a
+            href="https://calendly.com/vishwanthreddyjakka/30min"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          >
+            Book Call
+          </a>
+        ),
+        duration: 8000,
+      });
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   return (
     <section id="home" className="min-h-[90vh] flex items-center justify-center py-20 bg-background relative overflow-hidden">
@@ -47,7 +73,7 @@ export function HeroSection() {
 
             {/* CTA Buttons */}
             <motion.div
-              className="flex flex-wrap gap-4"
+              className="flex flex-wrap gap-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.6 }}
@@ -56,27 +82,37 @@ export function HeroSection() {
                 href={`${import.meta.env.BASE_URL}VishwanthReddyJakka_SoftwareEngineer.pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium rounded-lg transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
               >
                 <FaFileAlt />
-                <span>View Resume</span>
+                <span>Resume</span>
               </a>
 
               <a
                 href="http://linkedin.com/in/jvvr/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 border border-border bg-background hover:bg-accent hover:text-accent-foreground text-foreground font-medium rounded-lg transition-all hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-border bg-background hover:bg-accent hover:text-accent-foreground text-foreground text-sm font-medium rounded-lg transition-all hover:-translate-y-0.5"
               >
                 <FaLinkedin />
                 <span>LinkedIn</span>
               </a>
 
               <a
+                href="https://calendly.com/vishwanthreddyjakka/30min"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground text-sm font-medium rounded-lg transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+              >
+                <FaCalendarAlt />
+                <span>Connect</span>
+              </a>
+
+              <a
                 href="https://github.com/vishwaj1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 border border-border bg-background hover:bg-accent hover:text-accent-foreground text-foreground font-medium rounded-lg transition-all hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-border bg-background hover:bg-accent hover:text-accent-foreground text-foreground text-sm font-medium rounded-lg transition-all hover:-translate-y-0.5"
               >
                 <FaGithub />
                 <span>GitHub</span>
