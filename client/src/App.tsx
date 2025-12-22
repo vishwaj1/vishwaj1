@@ -8,12 +8,12 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   const [location] = useLocation();
-  // Use basePath only in production (GitHub Pages)
-  const basePath = import.meta.env.PROD ? '/vishwaj1' : '';
+  // Dynamically determine base path from Vite config
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
   return (
     <Switch>
-      <Route path={`${basePath}/`} component={Home}/>
+      <Route path={`${basePath}/`} component={Home} />
       <Route path={`${basePath}/*`} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

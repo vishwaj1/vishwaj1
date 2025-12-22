@@ -5,7 +5,7 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig({
 
-  base: process.env.VERCEL ? '/' : '/vishwaj1/',
+  base: process.env.NODE_ENV === "production" && !process.env.VERCEL ? '/vishwaj1/' : '/',
   plugins: [
     react(),
     runtimeErrorOverlay(),
