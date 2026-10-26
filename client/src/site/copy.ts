@@ -68,7 +68,7 @@ export const cases = {
     ],
     stack: "React · TypeScript · Supabase / PostgreSQL · Deno Edge Functions · MCP",
   },
-  pantry: {
+  umbc: {
     title: "UMBC",
     when: "Aug 2023 — May 2025 · Baltimore",
     role: "Graduate software engineer, UMBC",

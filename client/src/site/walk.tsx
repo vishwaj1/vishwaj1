@@ -19,6 +19,18 @@ function chapterHref(id: string) {
   return `${homePath}#${id}`;
 }
 
+function workHref(slug: string) {
+  return `${homePath}work/${slug}`;
+}
+
+function DetailsLink({ slug, label }: { slug: string; label: string }) {
+  return (
+    <a href={workHref(slug)} className="mt-8 inline-block text-sm uppercase tracking-[0.16em] text-[#e2a15a] hover:underline">
+      Stay with {label}
+    </a>
+  );
+}
+
 function scrollToChapter(id: string, behavior: ScrollBehavior) {
   const target = hashAliases[id] ?? id;
   const node = document.getElementById(target);
@@ -212,6 +224,7 @@ function LexsyScene({ reduced }: { reduced: boolean }) {
             </article>
           ))}
         </div>
+        <DetailsLink slug="lexsy" label="Lexsy" />
       </section>
     );
   }
@@ -236,6 +249,7 @@ function LexsyScene({ reduced }: { reduced: boolean }) {
                 <p className="mt-5 max-w-md text-lg leading-relaxed opacity-80">{copy.body}</p>
               </motion.div>
             </AnimatePresence>
+            <DetailsLink slug="lexsy" label="Lexsy" />
           </div>
           <ol className="grid gap-4 lg:grid-cols-4">
             {lexsyBeats.map((item, index) => {
@@ -297,6 +311,7 @@ function PantryScene({ reduced }: { reduced: boolean }) {
           <span className="mt-2 block text-sm uppercase tracking-[0.16em] opacity-70">from 450</span>
         </p>
       </div>
+      <DetailsLink slug="umbc" label="UMBC" />
     </section>
   );
 }
@@ -317,6 +332,7 @@ function PolycomScene({ reduced }: { reduced: boolean }) {
           <p className="mt-5 max-w-md text-lg leading-relaxed opacity-80">
             Scheduling, reporting, records. Load time down 35%. A classifier cut the repetitive review by 22%.
           </p>
+          <DetailsLink slug="polycom" label="Polycom" />
         </div>
         <div className="space-y-3" aria-hidden>
           {[100, 78, 46].map((width, index) => (
@@ -376,14 +392,15 @@ function WorkScene() {
 }
 
 export function CasePage({ slug }: { slug: string }) {
-  const key = slug as keyof typeof cases;
+  const aliases: Record<string, keyof typeof cases> = { pantry: "umbc" };
+  const key = (aliases[slug] ?? slug) as keyof typeof cases;
   const story = cases[key];
 
   if (!story) {
     return (
-      <main className="min-h-screen bg-[#f6f3ee] px-6 py-16 text-[#1c1917]" style={sans}>
+      <main className="min-h-screen bg-[#13110f] px-6 py-16 text-[#f3eee6]" style={sans}>
         <p>That page is not on this walk.</p>
-        <a href="/" className="mt-4 inline-block text-[#9a3412]">
+        <a href={homePath} className="mt-4 inline-block text-[#e2a15a]">
           Back
         </a>
       </main>
@@ -391,9 +408,9 @@ export function CasePage({ slug }: { slug: string }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f3ee] px-6 py-16 text-[#1c1917] md:px-10" style={sans}>
+    <main className="min-h-screen bg-[#13110f] px-6 py-16 text-[#f3eee6] md:px-10" style={sans}>
       <div className="mx-auto max-w-2xl">
-        <a href={`/#${key}`} className="text-[12px] uppercase tracking-[0.18em] text-[#9a3412]">
+        <a href={chapterHref(key)} className="text-[12px] uppercase tracking-[0.18em] text-[#e2a15a]">
           Back to the walk
         </a>
         <p className="mt-10 text-[12px] uppercase tracking-[0.18em] opacity-60">{story.role}</p>
