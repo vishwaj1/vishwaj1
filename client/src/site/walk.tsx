@@ -10,6 +10,22 @@ import { cases, chapters, doors, lexsyBeats, person, type ChapterId } from "./co
 
 const display = { fontFamily: '"Newsreader", "Iowan Old Style", Georgia, serif' } as const;
 const sans = { fontFamily: '"Plus Jakarta Sans", "Helvetica Neue", sans-serif' } as const;
+const homePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const hashAliases: Record<string, string> = { pantry: "umbc" };
+
+function chapterHref(id: string) {
+  return `${homePath}#${id}`;
+}
+
+function scrollToChapter(id: string, behavior: ScrollBehavior) {
+  const target = hashAliases[id] ?? id;
+  const node = document.getElementById(target);
+  if (!node) return false;
+  node.scrollIntoView({ behavior, block: "start" });
+  return true;
+}
 
 function useMediaMatch(queryText: string) {
   const [matches, setMatches] = useState(false);
@@ -30,12 +46,25 @@ export default function Walk() {
   const [active, setActive] = useState<ChapterId>("open");
 
   useEffect(() => {
-    if (reduced) return;
-    const root = document.documentElement;
-    const previous = root.style.scrollBehavior;
-    root.style.scrollBehavior = "smooth";
+    const jump = (behavior: ScrollBehavior) => {
+      const id = window.location.hash.replace(/^#/, "");
+      if (!id) return true;
+      return scrollToChapter(id, behavior);
+    };
+
+    let tries = 0;
+    let frame = 0;
+    const waitForNode = () => {
+      if (jump("auto") || tries++ > 40) return;
+      frame = requestAnimationFrame(waitForNode);
+    };
+    waitForNode();
+
+    const onHash = () => jump(reduced ? "auto" : "smooth");
+    window.addEventListener("hashchange", onHash);
     return () => {
-      root.style.scrollBehavior = previous;
+      cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", onHash);
     };
   }, [reduced]);
 
@@ -75,11 +104,16 @@ export default function Walk() {
         {chapters.map((chapter) => (
           <a
             key={chapter.id}
-            href={`#${chapter.id}`}
+            href={chapterHref(chapter.id)}
             aria-current={active === chapter.id ? "page" : undefined}
             className={`rounded-sm px-1 py-1 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a] ${
               active === chapter.id ? "text-[#e2a15a]" : "opacity-70 hover:opacity-100"
             }`}
+            onClick={(event) => {
+              event.preventDefault();
+              window.history.pushState(null, "", chapterHref(chapter.id));
+              scrollToChapter(chapter.id, reduced ? "auto" : "smooth");
+            }}
           >
             {chapter.label}
           </a>

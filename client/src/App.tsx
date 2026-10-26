@@ -15,16 +15,32 @@ function WorkRoute() {
 }
 
 function Router() {
-  // Dynamically determine base path from Vite config
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const roots = Array.from(
+    new Set(
+      [import.meta.env.BASE_URL.replace(/\/$/, ""), "/vishwaj1", ""].filter(
+        (value, index, list) => list.indexOf(value) === index,
+      ),
+    ),
+  );
 
   return (
     <Switch>
-      <Route path={`${basePath}/`} component={Walk} />
-      <Route path={`${basePath}/themes`} component={Themes} />
-      <Route path={`${basePath}/classic`} component={Home} />
-      <Route path={`${basePath}/work/:slug`} component={WorkRoute} />
-      <Route path={`${basePath}/*`} component={NotFound} />
+      {roots.map((root) => (
+        <Route key={`${root}-themes`} path={`${root}/themes`} component={Themes} />
+      ))}
+      {roots.map((root) => (
+        <Route key={`${root}-classic`} path={`${root}/classic`} component={Home} />
+      ))}
+      {roots.map((root) => (
+        <Route key={`${root}-work`} path={`${root}/work/:slug`} component={WorkRoute} />
+      ))}
+      <Route path="/" component={Walk} />
+      {roots.filter(Boolean).map((root) => (
+        <Route key={`${root}-home`} path={root} component={Walk} />
+      ))}
+      {roots.filter(Boolean).map((root) => (
+        <Route key={`${root}-home-slash`} path={`${root}/`} component={Walk} />
+      ))}
       <Route component={NotFound} />
     </Switch>
   );
