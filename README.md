@@ -1,6 +1,6 @@
 # Vishwanth Jakka — Portfolio
 
-Personal portfolio site (Vite + React client, Express API).
+Personal site for Vishwanth Reddy Jakka, a forward-deployed engineer. The home page is a scroll through the work. `/classic` keeps the previous site. `/themes` keeps the earlier visual studies.
 
 ## Run locally
 
