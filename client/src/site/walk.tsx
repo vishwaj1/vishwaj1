@@ -5,13 +5,11 @@ import {
   useInView,
   useMotionValueEvent,
   useScroll,
-  useTransform,
 } from "framer-motion";
-import { Link } from "wouter";
 import { cases, chapters, doors, lexsyBeats, person, type ChapterId } from "./copy";
 
-const display = { fontFamily: '"Instrument Serif", serif' } as const;
-const sans = { fontFamily: '"Inter Tight", sans-serif' } as const;
+const display = { fontFamily: '"Newsreader", "Iowan Old Style", Georgia, serif' } as const;
+const sans = { fontFamily: '"Plus Jakarta Sans", "Helvetica Neue", sans-serif' } as const;
 
 function useMediaMatch(queryText: string) {
   const [matches, setMatches] = useState(false);
@@ -29,16 +27,6 @@ export default function Walk() {
   const reduced = useMediaMatch("(prefers-reduced-motion: reduce)");
   const narrow = useMediaMatch("(max-width: 767px)");
   const { scrollYProgress } = useScroll();
-  const background = useTransform(
-    scrollYProgress,
-    [0, 0.28, 0.55, 0.82, 1],
-    ["#14110e", "#1b1612", "#4a3d32", "#e6dccb", "#f6f3ee"],
-  );
-  const foreground = useTransform(
-    scrollYProgress,
-    [0, 0.5, 0.68, 1],
-    ["#f6f1e8", "#f6f1e8", "#1c1917", "#1c1917"],
-  );
   const [active, setActive] = useState<ChapterId>("open");
 
   useEffect(() => {
@@ -73,8 +61,7 @@ export default function Walk() {
   }, []);
 
   return (
-    <motion.div style={{ ...sans, color: foreground }} className="relative min-h-screen">
-      <motion.div aria-hidden className="pointer-events-none fixed inset-0 -z-10" style={{ backgroundColor: background }} />
+    <div style={{ ...sans, color: "#f3eee6" }} className="relative min-h-screen bg-[#13110f]">
       <motion.div
         aria-hidden
         className="pointer-events-none fixed bottom-0 left-0 top-0 z-50 w-[3px] origin-top bg-[#e2a15a]"
@@ -82,7 +69,7 @@ export default function Walk() {
       />
 
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 flex justify-between gap-1 border-t border-white/10 bg-[#14110e]/85 px-2 py-2 text-[11px] uppercase tracking-[0.14em] text-[#f6f1e8] backdrop-blur md:bottom-auto md:left-5 md:right-auto md:top-1/2 md:w-28 md:-translate-y-1/2 md:flex-col md:gap-3 md:border-0 md:bg-transparent md:p-0 md:text-inherit md:backdrop-blur-none"
+        className="fixed bottom-0 left-0 right-0 z-40 flex justify-between gap-1 border-t border-white/10 bg-[#13110f]/90 px-2 py-2 text-[11px] uppercase tracking-[0.14em] text-[#f3eee6] backdrop-blur md:bottom-auto md:left-5 md:right-auto md:top-1/2 md:w-28 md:-translate-y-1/2 md:flex-col md:gap-3 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none"
         style={sans}
       >
         {chapters.map((chapter) => (
@@ -115,7 +102,7 @@ export default function Walk() {
         <PolycomScene reduced={reduced} />
         <WorkScene />
       </main>
-    </motion.div>
+    </div>
   );
 }
 
@@ -191,9 +178,6 @@ function LexsyScene({ reduced }: { reduced: boolean }) {
             </article>
           ))}
         </div>
-        <Link href="/work/lexsy" className="mt-10 inline-block text-sm uppercase tracking-[0.16em] text-[#e2a15a]">
-          Stay with Lexsy
-        </Link>
       </section>
     );
   }
@@ -218,9 +202,6 @@ function LexsyScene({ reduced }: { reduced: boolean }) {
                 <p className="mt-5 max-w-md text-lg leading-relaxed opacity-80">{copy.body}</p>
               </motion.div>
             </AnimatePresence>
-            <Link href="/work/lexsy" className="mt-8 inline-block text-sm uppercase tracking-[0.16em] text-[#e2a15a] hover:underline">
-              Stay with Lexsy
-            </Link>
           </div>
           <ol className="grid gap-4 lg:grid-cols-4">
             {lexsyBeats.map((item, index) => {
@@ -262,8 +243,8 @@ function PantryScene({ reduced }: { reduced: boolean }) {
   }, [inView, reduced]);
 
   return (
-    <section id="pantry" ref={ref} className="flex min-h-[100svh] scroll-mt-6 flex-col justify-center py-24">
-      <p className="text-[11px] uppercase tracking-[0.22em] opacity-60">Campus Pantry · UMBC</p>
+    <section id="umbc" ref={ref} className="flex min-h-[100svh] scroll-mt-6 flex-col justify-center py-24">
+      <p className="text-[11px] uppercase tracking-[0.22em] opacity-60">UMBC · Campus Pantry</p>
       <p className="mt-4 max-w-xl text-3xl leading-snug sm:text-4xl" style={display}>
         The staff already knew the constraints. I built the line around them.
       </p>
@@ -282,9 +263,6 @@ function PantryScene({ reduced }: { reduced: boolean }) {
           <span className="mt-2 block text-sm uppercase tracking-[0.16em] opacity-70">from 450</span>
         </p>
       </div>
-      <Link href="/work/pantry" className="mt-10 text-sm uppercase tracking-[0.16em] text-[#e2a15a] hover:underline">
-        Stay with the pantry
-      </Link>
     </section>
   );
 }
@@ -305,9 +283,6 @@ function PolycomScene({ reduced }: { reduced: boolean }) {
           <p className="mt-5 max-w-md text-lg leading-relaxed opacity-80">
             Scheduling, reporting, records. Load time down 35%. A classifier cut the repetitive review by 22%.
           </p>
-          <Link href="/work/polycom" className="mt-8 inline-block text-sm uppercase tracking-[0.16em] text-[#e2a15a] hover:underline">
-            Stay with Polycom
-          </Link>
         </div>
         <div className="space-y-3" aria-hidden>
           {[100, 78, 46].map((width, index) => (
@@ -374,9 +349,9 @@ export function CasePage({ slug }: { slug: string }) {
     return (
       <main className="min-h-screen bg-[#f6f3ee] px-6 py-16 text-[#1c1917]" style={sans}>
         <p>That page is not on this walk.</p>
-        <Link href="/" className="mt-4 inline-block text-[#9a3412]">
+        <a href="/" className="mt-4 inline-block text-[#9a3412]">
           Back
-        </Link>
+        </a>
       </main>
     );
   }

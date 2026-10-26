@@ -17,7 +17,7 @@ export const person = {
 export const chapters = [
   { id: "open", label: "Open" },
   { id: "lexsy", label: "Lexsy" },
-  { id: "pantry", label: "Pantry" },
+  { id: "umbc", label: "UMBC" },
   { id: "polycom", label: "Polycom" },
   { id: "work", label: "Open work" },
 ] as const;
@@ -69,7 +69,7 @@ export const cases = {
     stack: "React · TypeScript · Supabase / PostgreSQL · Deno Edge Functions · MCP",
   },
   pantry: {
-    title: "Campus Pantry",
+    title: "UMBC",
     when: "Aug 2023 — May 2025 · Baltimore",
     role: "Graduate software engineer, UMBC",
     sections: [
