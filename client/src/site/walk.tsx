@@ -6,28 +6,27 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
+import { Link } from "wouter";
+import { routerBase } from "@/lib/router-base";
 import { cases, chapters, doors, lexsyBeats, person, type ChapterId } from "./copy";
 
 const display = { fontFamily: '"Newsreader", "Iowan Old Style", Georgia, serif' } as const;
 const sans = { fontFamily: '"Plus Jakarta Sans", "Helvetica Neue", sans-serif' } as const;
-const homePath = import.meta.env.BASE_URL.endsWith("/")
-  ? import.meta.env.BASE_URL
-  : `${import.meta.env.BASE_URL}/`;
+const homePath = routerBase ? `${routerBase}/` : "/";
 const hashAliases: Record<string, string> = { pantry: "umbc" };
 
 function chapterHref(id: string) {
   return `${homePath}#${id}`;
 }
 
-function workHref(slug: string) {
-  return `${homePath}work/${slug}`;
-}
-
 function DetailsLink({ slug, label }: { slug: string; label: string }) {
   return (
-    <a href={workHref(slug)} className="mt-8 inline-block text-sm uppercase tracking-[0.16em] text-[#e2a15a] hover:underline">
+    <Link
+      href={`/work/${slug}`}
+      className="mt-8 inline-block text-sm uppercase tracking-[0.16em] text-[#e2a15a] hover:underline"
+    >
       Stay with {label}
-    </a>
+    </Link>
   );
 }
 
