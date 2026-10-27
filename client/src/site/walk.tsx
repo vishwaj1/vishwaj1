@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
@@ -394,6 +394,10 @@ export function CasePage({ slug }: { slug: string }) {
   const aliases: Record<string, keyof typeof cases> = { pantry: "umbc" };
   const key = (aliases[slug] ?? slug) as keyof typeof cases;
   const story = cases[key];
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [slug]);
 
   if (!story) {
     return (
