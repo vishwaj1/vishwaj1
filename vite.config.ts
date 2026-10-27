@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import fs from "fs";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig({
@@ -8,6 +9,17 @@ export default defineConfig({
   base: process.env.NODE_ENV === "production" && !process.env.VERCEL ? '/vishwaj1/' : '/',
   plugins: [
     react(),
+    {
+      name: "github-pages-spa-fallback",
+      closeBundle() {
+        const outDir = path.resolve(import.meta.dirname, "dist");
+        const index = path.join(outDir, "index.html");
+        const fallback = path.join(outDir, "404.html");
+        if (fs.existsSync(index)) {
+          fs.copyFileSync(index, fallback);
+        }
+      },
+    },
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
       process.env.REPL_ID !== undefined
