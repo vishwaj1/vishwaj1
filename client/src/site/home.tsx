@@ -101,8 +101,10 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-[#2a2622] bg-[#0c0b09]/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-[max(1rem,env(safe-area-inset-left))] py-2 sm:px-8">
           <div className="flex items-center gap-1.5">
-            <a href="#top" className={`${boxSecondary} px-3`} aria-label="Back to top">
-              vrj
+            <a href="#top" className={`${boxSecondary} whitespace-nowrap px-3`} aria-label="Vishwanth Reddy, back to top">
+              <span>
+                vishwanth<span className="hidden sm:inline"> reddy</span>
+              </span>
             </a>
             <nav className="hidden items-center gap-1.5 lg:flex" aria-label="Sections">
               <a href="#proof" className={`${boxSecondary} px-3`}>proof</a>
@@ -144,11 +146,17 @@ export default function Home() {
           {/* Hero */}
           <section className="grid gap-8 pb-14 pt-8 sm:grid-cols-[1.5fr_1fr] sm:items-center sm:gap-10 sm:pt-12 lg:grid-cols-[1.4fr_0.8fr] lg:gap-14 lg:pb-20 lg:pt-16">
             <div>
-              <motion.p {...fade(0)} className={`${mono} inline-block border border-[#3a352f] px-2.5 py-1.5 text-[12px] lowercase text-[#c9c2b5]`}>
+              <motion.div {...fade(0)}>
+                <h1 className="text-[1.75rem] font-medium leading-tight tracking-[-0.01em] text-[#f6f1e7] sm:text-[2rem]">
+                  {person.name}
+                </h1>
+                <p className={`${label} mt-1 text-[13px]`}>forward-deployed engineer</p>
+              </motion.div>
+              <motion.p {...fade(0)} className={`${mono} mt-5 inline-block border border-[#3a352f] px-2.5 py-1.5 text-[12px] lowercase text-[#c9c2b5]`}>
                 {status}
               </motion.p>
               <AnimatePresence mode="wait" initial={false}>
-                <motion.h1
+                <motion.p
                   key={`${mode}-${voice.id}`}
                   initial={reduced ? false : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -166,7 +174,7 @@ export default function Home() {
                       {voice.line} <i className="text-[#d4845a]">{voice.rest}</i>
                     </>
                   )}
-                </motion.h1>
+                </motion.p>
               </AnimatePresence>
               <div className="mt-6 h-px w-14 bg-[#d4845a]" />
               <AnimatePresence mode="wait" initial={false}>
