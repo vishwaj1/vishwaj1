@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link } from "wouter";
 import { FaLinkedinIn } from "react-icons/fa";
@@ -8,6 +8,7 @@ import { person } from "./copy";
 import { formatCardNumber, genericQuestion, parseCardNumber, questionForCard } from "./cards";
 import {
   backendEnabled,
+  loadCardContent,
   loadScan,
   loadWall,
   looksProfane,
@@ -17,6 +18,7 @@ import {
   submitAnswer,
   track,
   updateAnswer,
+  type CardContent,
   type MyAnswer,
   type ScanResult,
   type WallEntry,
@@ -70,7 +72,19 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   const reduced = useReducedMotion() ?? false;
   const card = parseCardNumber(params?.n);
   const cardLabel = card ? formatCardNumber(card) : null;
-  const question = card ? questionForCard(card) : genericQuestion;
+  const printed = card ? questionForCard(card) : genericQuestion;
+  const [content, setContent] = useState<CardContent[] | null>(null);
+
+  // Supabase is the editable source for chips and my own answer; the printed
+  // text stays authoritative, since it is already ink on the card in someone's
+  // hand. Matched by id, so a reordering in the table can never swap questions.
+  const question = useMemo(() => {
+    const row = content?.find((r) => r.question_id === printed.id);
+    if (!row) return printed;
+    const chips = Array.isArray(row.chips) && row.chips.length === 3 ? (row.chips as unknown as typeof printed.chips) : printed.chips;
+    return { ...printed, chips, mine: row.mine || printed.mine };
+  }, [content, printed]);
+
   const givenName = person.name.split(" ")[0];
   const cardUrl = `${SITE_ORIGIN}/hi${card ? `/${cardLabel}` : ""}`;
 
@@ -93,6 +107,18 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   const connectRef = useRef<HTMLDivElement>(null);
   const customRef = useRef<HTMLInputElement>(null);
   const trackedWall = useRef(false);
+
+  // Editable copy from Supabase: chips and my own answer. Fire-and-forget, so
+  // nothing on the page waits for it; cards.ts has already rendered.
+  useEffect(() => {
+    let cancelled = false;
+    loadCardContent().then((rows) => {
+      if (!cancelled && rows) setContent(rows);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Title, scroll reset, scan analytics, scan counter, remembered answer.
   useEffect(() => {
@@ -371,6 +397,12 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                     That's in. Thank you.
                   </p>
                   <p className="mt-2 break-words opacity-70">You said: “{mine.answer}”</p>
+                </div>
+                <div className="mt-5 border-t border-white/20 pt-4">
+                  <p className={`${label} opacity-70`}>{givenName}’s answer</p>
+                  <p className="mt-2 break-words text-xl leading-snug text-[#f6f1e7]" style={display}>
+                    {question.mine}
+                  </p>
                 </div>
                 <button type="button" onClick={startEditing} className={`${textLink} mt-2`}>
                   Change my answer

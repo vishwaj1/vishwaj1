@@ -1,57 +1,70 @@
 /**
  * Questions printed on the back of the 100 business cards, each with three
- * tap-to-answer chips. Card n gets questions[(n - 1) % questions.length]:
- * deterministic, and with 25 questions every one appears on exactly 4 cards.
- * Work-leaning and human questions are interleaved (every third is work).
+ * tap-to-answer chips and Vishwanth's own one-line answer.
+ *
+ * Card n gets questions[(n - 1) % questions.length]: deterministic, and with
+ * 25 questions every one appears on exactly 4 cards, while any run of 25
+ * consecutive cards covers all 25 without repeating. Work-leaning questions
+ * are spread through the order so cards handed out at the same event don't
+ * all ask about work.
+ *
+ * This file is the offline fallback and the source of the printed text. The
+ * same rows live in Supabase (public.card_content) so chips and answers can
+ * be edited without a deploy; the page renders this instantly, then
+ * reconciles. Keep the two in step when you change anything here.
+ *
+ * `mine` is revealed only after the visitor answers. Reciprocal disclosure is
+ * what makes people willing to share (Aron's "fast friends" effect), so it
+ * must be true and in his voice. Lines marked NEEDS-VERIFY are drafts.
  */
 export type Question = {
   /** Stable id stored with each answer. Never rename once cards are printed. */
   id: string;
   text: string;
   chips: readonly [string, string, string];
+  /** Vishwanth's answer, shown after the visitor answers. */
+  mine: string;
 };
 
-const work: Question[] = [
-  { id: "team-building", text: "What is your team building right now?", chips: ["Something customers asked for", "A scary rewrite", "Still figuring it out"] },
-  { id: "manual-process", text: "What is the most annoying manual process at your job?", chips: ["Copy-pasting between tabs", "Chasing approvals", "Reports nobody reads"] },
-  { id: "fix-workflow", text: "What is a workflow you wish someone would just fix?", chips: ["Onboarding new people", "Anything in a spreadsheet", "Handoffs between teams"] },
-  { id: "hardest-thing", text: "What is the hardest thing you are working on this month?", chips: ["Getting people to agree", "A deadline that won't move", "Finding the real problem"] },
-  { id: "tool-wish", text: "What tool do you wish existed at work?", chips: ["One search for everything", "Meeting notes that act", "Undo for everything"] },
-  { id: "spreadsheet", text: "What does your team do in a spreadsheet that it should not?", chips: ["Run the whole company", "Track customers", "Plan the roadmap"] },
-  { id: "shipped-lately", text: "What is the best thing you have shipped lately?", chips: ["A tiny fix that mattered", "A feature nobody asked for", "The thing I almost didn't ship"] },
-  { id: "day-one", text: "What would you hand a new hire on day one?", chips: ["The scary legacy code", "One small, real win", "The docs I never wrote"] },
-  { id: "keeps-returning", text: "What problem keeps coming back no matter how often you fix it?", chips: ["Flaky anything", "Unclear ownership", "Same bug, new costume"] },
+export const questions: readonly Question[] = [
+  { id: "surprised", text: "What's the last thing that genuinely surprised you?", chips: ["A person", "A machine", "Myself"], mine: "How often the right fix turned out to be a conversation, not code." },
+  { id: "hardest-problem", text: "What's the hardest problem on your plate this month?", chips: ["People, not the work", "Scope", "Knowing what matters"], mine: "Explaining in one sentence what a forward-deployed engineer actually does." },
+  { id: "lost-time", text: "When did you last lose track of time?", chips: ["Debugging", "A conversation", "A book"], mine: "Wiring up the twentieth tool and watching the agent finally use it right." },
+  // NEEDS-VERIFY
+  { id: "small-improvement", text: "What's the smallest thing that improved your week?", chips: ["Deleting an app", "A real lunch", "A walk"], mine: "Writing the day's three things on paper before opening the laptop." },
+  { id: "free-week", text: "What would you build with one free week?", chips: ["Useless and beautiful", "What nobody will fund", "An old unfinished thing"], mine: "Something that reads a contract and tells you only what changed." },
+  { id: "overrated", text: "What's overrated in your field?", chips: ["Meetings about meetings", "The newest tool", "Moving fast"], mine: "Demos. Anyone can demo. Fifty real users is the hard part." },
+  { id: "skill-if-free", text: "What's a skill you'd learn if time were free?", chips: ["An instrument", "A language", "Something with my hands"], mine: "To dance." },
+  { id: "unreasonably-good", text: "What's a small thing you're unreasonably good at?", chips: ["Parallel parking", "Remembering names", "Packing light"], mine: "Finding the one line in a four-hundred-line log that actually matters." },
+  { id: "cant-stop", text: "What are you working on that you can't stop thinking about?", chips: ["Something at work", "A side project", "Nothing, and that's fine"], mine: "How to let an agent act without ever letting it act alone." },
+  // NEEDS-VERIFY
+  { id: "curious-outside-work", text: "What are you curious about that has nothing to do with work?", chips: ["Space", "How cities work", "Fermentation"], mine: "How cities decide where to put things." },
+  { id: "worth-slowly", text: "What's worth doing slowly?", chips: ["Hiring", "Writing", "Cooking"], mine: "Deciding what the first version is. Everything after that can be fast." },
+  // NEEDS-VERIFY
+  { id: "made-by-hand", text: "What's the last thing you made with your hands?", chips: ["Food", "Furniture", "Nothing lately"], mine: "Dinner, badly." },
+  { id: "job-misunderstood", text: "What do people get wrong about your job?", chips: ["That it's typing", "That it's solitary", "That it's logical"], mine: "They think it's building software. Most of it is working out what's actually being asked." },
+  { id: "taught-me-most", text: "Who taught you the most, and didn't know it?", chips: ["A colleague", "A stranger", "Someone I argued with"], mine: "A lawyer who kept saying “that's not how it works” until I understood why." },
+  // NEEDS-VERIFY
+  { id: "nobody-uses", text: "What's the best thing you've made that nobody uses?", chips: ["A tool for one", "A script I still use", "Several, honestly"], mine: "A small tool I built for one person, who then changed jobs." },
+  { id: "five-years-ago", text: "What do you wish someone had told you five years ago?", chips: ["Ask sooner", "Nobody's watching", "It compounds"], mine: "You can just go and talk to the people who use the thing." },
+  { id: "automate-forever", text: "What's one thing you'd automate forever?", chips: ["Status updates", "Expenses", "Scheduling"], mine: "Chasing signatures." },
+  { id: "changed-mind", text: "What's a belief you've changed your mind about?", chips: ["How teams work", "What good work is", "Remote vs in person"], mine: "I used to think good specs came first. They come from sitting with the work." },
+  { id: "better-than-last-year", text: "What are you better at than you were a year ago?", chips: ["Saying no", "Shipping early", "Listening"], mine: "Asking the dumb question early instead of the smart one late." },
+  { id: "remembered-for", text: "What would you want to be remembered for at work?", chips: ["Made things easier", "One thing that lasted", "Being the calm one"], mine: "That what I built was still standing after I left." },
+  { id: "decade-problem", text: "What's a problem you'd happily spend a decade on?", chips: ["Making something less awful", "Teaching", "Something small and deep"], mine: "Making legal work feel less like paperwork and more like progress." },
+  { id: "if-nobody-judged", text: "What would you do differently if nobody judged it?", chips: ["Start over", "Say the obvious thing", "Work less, think more"], mine: "Ship the rough version on day one and let people argue with it." },
+  { id: "ignored-advice", text: "What's the best advice you ignored?", chips: ["Play it safe", "Specialize", "Wait your turn"], mine: "Pick one stack and stay in it." },
+  // NEEDS-VERIFY
+  { id: "bad-job", text: "What's the most useful thing you learned from a bad job?", chips: ["What not to do", "How to leave", "Who I am under pressure"], mine: "A process nobody questions is usually the real bug." },
+  { id: "this-year", text: "What are you hoping happens this year?", chips: ["A change", "Something steady", "No idea yet"], mine: "Landing somewhere I get to sit with customers again." },
 ];
-
-const human: Question[] = [
-  { id: "free-week", text: "What would you build with one free week?", chips: ["Something useless and beautiful", "The thing at work nobody will fund", "Finally finish an old project"] },
-  { id: "recently-learned", text: "What is something you learned recently that surprised you?", chips: ["Sleep beats caffeine", "Asking beats guessing", "I need less than I think"] },
-  { id: "small-win-week", text: "What is a small thing that made your week better?", chips: ["A really good coffee", "A walk outside", "A friend's random text"] },
-  { id: "taught-me-work", text: "Who taught you the most about how to work?", chips: ["A tough manager", "A patient teammate", "My parents"] },
-  { id: "outside-skill", text: "What is a skill you picked up outside of work?", chips: ["Cooking for crowds", "Something with my hands", "Another language"] },
-  { id: "ignored-advice", text: "What is the best advice you have ignored?", chips: ["Take more breaks", "Slow down", "Don't take it personally"] },
-  { id: "looking-forward", text: "What are you looking forward to this year?", chips: ["One big trip", "Shipping something big", "Honestly, rest"] },
-  { id: "comfort-media", text: "What is a book, show or song you keep coming back to?", chips: ["A comfort show", "One album on repeat", "A book I reread"] },
-  { id: "age-ten", text: "What did you want to be when you were ten?", chips: ["An astronaut", "A pro athlete", "A game designer"] },
-  { id: "quiet-pride", text: "What is something you are proud of that nobody asked about?", chips: ["A hard thing I finished", "How I handled a bad day", "A quiet personal win"] },
-  { id: "best-meal", text: "What is the best meal you have had this year?", chips: ["Something my family made", "Street food", "A random Tuesday dinner"] },
-  { id: "go-back", text: "What is a place you would go back to tomorrow?", chips: ["A beach, any beach", "Somewhere with mountains", "My hometown"] },
-  { id: "ask-me-more", text: "What is a question you wish people asked you more?", chips: ["How are you, really?", "What are you building?", "What's next for you?"] },
-  { id: "changed-mind", text: "What is something you changed your mind about?", chips: ["Remote work", "Meetings", "What success means"] },
-  { id: "quiet-habit", text: "What is a habit that has quietly helped you?", chips: ["Writing things down", "Morning walks", "Saying no more"] },
-  { id: "kindest-work", text: "What is the kindest thing someone did for you at work?", chips: ["Gave me a chance", "Covered for me", "Said it was okay to ask"] },
-];
-
-// Every third slot is a work question (9 work + 16 human = 25).
-export const questions: readonly Question[] = Array.from({ length: work.length + human.length }, (_, i) =>
-  i % 3 === 0 ? work[i / 3] : human[i - Math.floor(i / 3) - 1],
-);
 
 /** Shown on /hi, and for any card number that is missing or out of range. */
 export const genericQuestion: Question = {
   id: "generic",
   text: "What is something you are working on that you wish went faster?",
   chips: ["A side project", "Something at work", "My own habits"],
+  mine: "Getting software in front of the people who have to live with it.",
 };
 
 export const CARD_COUNT = 100;

@@ -278,3 +278,35 @@ export function ordinal(n: number): string {
       return `${n}th`;
   }
 }
+
+// ---------------------------------------------------------------- card content
+export type CardContent = {
+  question_id: string;
+  sort_order: number;
+  question: string;
+  chips: string[];
+  mine: string;
+};
+
+/**
+ * The 25 questions as they currently stand in Supabase, so chips and answers
+ * can be edited without a deploy. Returns null when the backend is off, slow
+ * or empty: callers keep the copy baked into cards.ts, which always renders
+ * first so the question never waits on the network.
+ */
+export async function loadCardContent(): Promise<CardContent[] | null> {
+  if (!backendEnabled) return null;
+  try {
+    const supabase = await getClient();
+    const { data, error } = await withTimeout(
+      supabase
+        .from("card_content")
+        .select("question_id,sort_order,question,chips,mine")
+        .order("sort_order"),
+    );
+    if (error || !Array.isArray(data) || data.length === 0) return null;
+    return data as CardContent[];
+  } catch {
+    return null;
+  }
+}
