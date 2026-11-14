@@ -27,7 +27,6 @@ export function PromptTheme() {
         <header className="flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-[#a39e93]">
           <span>{person.mark}</span>
           <span className="hidden sm:inline">{person.role}</span>
-          <span>{person.place}</span>
         </header>
 
         <div className="mt-10 grid flex-1 items-end gap-10 lg:grid-cols-[1.4fr_0.8fr] lg:items-center">

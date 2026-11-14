@@ -4,7 +4,7 @@ import webTalk from "@/assets/projects/web-talk.png";
 
 export const person = {
   name: "Vishwanth Reddy Jakka",
-  role: "Forward-Deployed Engineer, Charlotte",
+  role: "Forward-Deployed Engineer",
   line: "I sit with the people doing the work. Then I ship the system.",
   photo: profile,
   email: "vishwanthreddy2601@gmail.com",
