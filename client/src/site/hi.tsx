@@ -8,11 +8,14 @@ import {
   backendEnabled,
   loadScan,
   loadWall,
-  localFlags,
   looksProfane,
   ordinal,
+  readMine,
+  removeAnswer,
   submitAnswer,
   track,
+  updateAnswer,
+  type MyAnswer,
   type ScanResult,
   type WallEntry,
 } from "./hi-data";
@@ -69,8 +72,10 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   const cardUrl = `${SITE_ORIGIN}/hi${card ? `/${cardLabel}` : ""}`;
 
   const [scan, setScan] = useState<ScanResult | null>(null);
-  const [answered, setAnswered] = useState<string | null>(null);
-  const [busy, setBusy] = useState<string | null>(null); // the chip text being sent
+  const [mine, setMine] = useState<MyAnswer | null>(null); // this browser's own saved answer
+  const [editing, setEditing] = useState(false); // changing an existing answer
+  const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState<string | null>(null); // the chip text (or "__remove") in flight
   const [error, setError] = useState("");
   const [customOpen, setCustomOpen] = useState(false);
   const [custom, setCustom] = useState("");
@@ -97,9 +102,10 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     setWall(null);
     setError("");
     setCustomOpen(false);
+    setEditing(false);
+    setNotice("");
     trackedWall.current = false;
-    const before = card ? localFlags.get(localFlags.answeredKey(card)) : null;
-    setAnswered(before && before !== "1" ? before : before ? "…" : null);
+    setMine(card ? readMine(card) : null);
     if (card) {
       loadScan(card).then((result) => {
         if (!cancelled) setScan(result);
@@ -111,9 +117,10 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     };
   }, [card, cardLabel]);
 
-  // Reveal the wall once answered (this visit or an earlier one).
+  // Reveal the wall once answered (this visit or an earlier one); refresh it when the answer changes.
+  const mineSignature = mine ? `${mine.answer}|${mine.firstName}` : "";
   useEffect(() => {
-    if (!answered || !backendEnabled) return;
+    if (!mineSignature || !backendEnabled) return;
     let cancelled = false;
     loadWall(question.id).then((entries) => {
       if (cancelled || !entries) return;
@@ -126,7 +133,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     return () => {
       cancelled = true;
     };
-  }, [answered, question.id, cardLabel]);
+  }, [mineSignature, question.id, cardLabel]);
 
   // Sticky bar: appears once the hero has scrolled out of view.
   useEffect(() => {
@@ -157,28 +164,43 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     };
   }, []);
 
+  /** CREATE a new answer, or UPDATE the one this browser already saved. */
   const send = useCallback(
     async (text: string, kind: "chip_answer" | "custom_answer") => {
       if (!card || busy) return;
       setError("");
+      setNotice("");
       setBusy(text);
-      const ok = await submitAnswer({
-        card,
-        questionId: question.id,
-        answer: text,
-        firstName: kind === "custom_answer" ? firstName : undefined,
-        email: kind === "custom_answer" ? email : undefined,
-      });
+      const name = kind === "custom_answer" ? firstName : mine?.firstName ?? "";
+      let saved: MyAnswer | null = null;
+      if (mine) {
+        const result = await updateAnswer(card, mine, text, name);
+        if (result === "ok") saved = { ...mine, answer: text, firstName: name.trim() };
+        // Row vanished (e.g. moderated): re-create it under the same token.
+        else if (result === "missing") {
+          saved = await submitAnswer({ card, questionId: question.id, answer: text, firstName: name }, mine.token);
+        }
+      } else {
+        saved = await submitAnswer({
+          card,
+          questionId: question.id,
+          answer: text,
+          firstName: kind === "custom_answer" ? firstName : undefined,
+          email: kind === "custom_answer" ? email : undefined,
+        });
+      }
       setBusy(null);
-      if (!ok) {
+      if (!saved) {
         setError("That didn't save. Check your connection and tap again.");
         return;
       }
-      localFlags.set(localFlags.answeredKey(card), text);
-      track(kind, { card: cardLabel, question: question.id });
-      setAnswered(text);
+      track(mine ? "answer_changed" : kind, { card: cardLabel, question: question.id });
+      setMine(saved);
+      setEditing(false);
+      setCustomOpen(false);
+      setCustom("");
     },
-    [card, busy, question.id, cardLabel, firstName, email],
+    [card, busy, mine, question.id, cardLabel, firstName, email],
   );
 
   function onCustomSubmit(event: FormEvent) {
@@ -194,10 +216,58 @@ export default function Hi({ params }: { params?: { n?: string } }) {
 
   function openCustom() {
     // The input mounts with autoFocus inside this tap, which is what iOS needs to open the keyboard.
+    setError("");
     setCustomOpen(true);
     setTimeout(() => {
       customRef.current?.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
     }, 60);
+  }
+
+  /** Close the "Something else" form without saving anything. */
+  function closeCustom() {
+    setCustomOpen(false);
+    setError("");
+    if (!mine) setCustom("");
+  }
+
+  /** Reopen the choices to change a saved answer. Nothing changes until they pick again. */
+  function startEditing() {
+    if (!mine) return;
+    const wasChip = question.chips.includes(mine.answer as never);
+    setCustom(wasChip ? "" : mine.answer);
+    setFirstName(mine.firstName);
+    setError("");
+    setNotice("");
+    setCustomOpen(false);
+    setEditing(true);
+  }
+
+  /** Back out of editing: keep the saved answer exactly as it was. */
+  function cancelEditing() {
+    setEditing(false);
+    setCustomOpen(false);
+    setError("");
+  }
+
+  /** DELETE the saved answer and return to the choices. */
+  async function onRemove() {
+    if (!card || !mine || busy) return;
+    setError("");
+    setBusy("__remove");
+    const ok = await removeAnswer(card, mine);
+    setBusy(null);
+    if (!ok) {
+      setError("That didn't go through. Check your connection and try again.");
+      return;
+    }
+    track("answer_removed", { card: cardLabel, question: question.id });
+    setMine(null);
+    setEditing(false);
+    setCustomOpen(false);
+    setCustom("");
+    setFirstName("");
+    setWall(null);
+    setNotice("Removed. You can answer again anytime.");
   }
 
   async function onShare() {
@@ -268,60 +338,112 @@ export default function Hi({ params }: { params?: { n?: string } }) {
           </motion.section>
         </div>
 
-        {/* 3. Chips, then inline confirmation */}
+        {/* 3. Chips, then inline confirmation (with change / remove) */}
         <section className="mt-6" aria-label="Answer">
           <AnimatePresence mode="wait" initial={false}>
-            {answered ? (
+            {mine && !editing ? (
               <motion.div
                 key="thanks"
-                role="status"
                 initial={reduced ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
                 className="border border-white/25 px-4 py-5"
               >
-                <p className="text-2xl leading-snug" style={display}>
-                  Thank you. That's in.
-                </p>
-                {answered !== "…" && <p className="mt-2 opacity-70">You said: “{answered}”</p>}
+                <div role="status">
+                  <p className="text-2xl leading-snug" style={display}>
+                    Thank you. That's in.
+                  </p>
+                  <p className="mt-2 break-words opacity-70">You said: “{mine.answer}”</p>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={startEditing}
+                    disabled={busy !== null}
+                    className="flex min-h-[48px] items-center justify-center border border-white/25 px-3 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                  >
+                    Change
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void onRemove()}
+                    disabled={busy !== null}
+                    className="flex min-h-[48px] items-center justify-center border border-white/25 px-3 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                  >
+                    {busy === "__remove" ? "Removing…" : "Remove"}
+                  </button>
+                </div>
+                {error && (
+                  <p role="alert" className="mt-3 text-base leading-snug">
+                    {error}
+                  </p>
+                )}
               </motion.div>
             ) : (
               <motion.div key="chips" exit={reduced ? undefined : { opacity: 0 }} transition={{ duration: 0.15 }}>
+                {notice && (
+                  <p role="status" className="mb-4 text-base leading-snug opacity-80">
+                    {notice}
+                  </p>
+                )}
+                {editing && mine && (
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <p className={`${label} opacity-70`}>Changing your answer</p>
+                    <button
+                      type="button"
+                      onClick={cancelEditing}
+                      className="min-h-[44px] px-2 text-[12px] uppercase tracking-[0.16em] text-[#f3eee6] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                    >
+                      Keep mine
+                    </button>
+                  </div>
+                )}
                 <ul className="space-y-3">
-                  {question.chips.map((chip) => (
-                    <li key={chip}>
-                      {backendEnabled && card ? (
-                        <button
-                          type="button"
-                          disabled={busy !== null}
-                          onClick={() => void send(chip, "chip_answer")}
-                          className={`min-h-[56px] w-full border px-4 py-3 text-left text-lg leading-snug transition-colors duration-150 active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a] disabled:opacity-60 ${
-                            busy === chip ? "border-[#f3eee6] bg-white/10" : "border-white/25"
-                          }`}
-                          style={display}
-                        >
-                          {chip}
-                        </button>
-                      ) : (
-                        <a
-                          href={mailto(chip)}
-                          className="flex min-h-[56px] w-full items-center border border-white/25 px-4 py-3 text-lg leading-snug active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
-                          style={display}
-                        >
-                          {chip}
-                        </a>
-                      )}
-                    </li>
-                  ))}
+                  {question.chips.map((chip) => {
+                    const current = editing && mine?.answer === chip;
+                    return (
+                      <li key={chip}>
+                        {backendEnabled && card ? (
+                          <button
+                            type="button"
+                            disabled={busy !== null}
+                            aria-pressed={current || undefined}
+                            onClick={() => void send(chip, "chip_answer")}
+                            className={`min-h-[56px] w-full border px-4 py-3 text-left text-lg leading-snug transition-colors duration-150 active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a] disabled:opacity-60 ${
+                              busy === chip || current ? "border-[#f3eee6] bg-white/10" : "border-white/25"
+                            }`}
+                            style={display}
+                          >
+                            {chip}
+                            {current && <span className={`ml-3 ${label} opacity-70`}>Your answer</span>}
+                          </button>
+                        ) : (
+                          <a
+                            href={mailto(chip)}
+                            className="flex min-h-[56px] w-full items-center border border-white/25 px-4 py-3 text-lg leading-snug active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                            style={display}
+                          >
+                            {chip}
+                          </a>
+                        )}
+                      </li>
+                    );
+                  })}
                   <li>
                     {backendEnabled && card ? (
                       customOpen ? (
-                        <form onSubmit={onCustomSubmit} className="space-y-4 border border-white/25 p-4">
+                        <form
+                          onSubmit={onCustomSubmit}
+                          onKeyDown={(e) => e.key === "Escape" && closeCustom()}
+                          className="space-y-4 border border-white/25 p-4"
+                        >
                           <div>
-                            <label htmlFor="hi-custom" className={`${label} flex justify-between opacity-70`}>
-                              <span>Your answer</span>
-                              <span className="tabular-nums">{custom.length}/140</span>
-                            </label>
+                            <div className="flex items-center justify-between">
+                              <label htmlFor="hi-custom" className={`${label} opacity-70`}>
+                                Your answer
+                              </label>
+                              <span className={`${label} tabular-nums opacity-60`}>{custom.length}/140</span>
+                            </div>
                             <input
                               id="hi-custom"
                               ref={customRef}
@@ -352,43 +474,55 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                               onChange={(e) => setFirstName(e.target.value)}
                               autoComplete="given-name"
                               autoCapitalize="words"
-                              enterKeyHint="next"
+                              enterKeyHint={mine ? "send" : "next"}
                               className={field}
                             />
                           </div>
-                          <div>
-                            <label htmlFor="hi-email" className={`${label} opacity-70`}>
-                              Email (optional)
-                            </label>
-                            <input
-                              id="hi-email"
-                              type="email"
-                              name="email"
-                              maxLength={120}
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              inputMode="email"
-                              autoComplete="email"
-                              autoCapitalize="none"
-                              autoCorrect="off"
-                              spellCheck={false}
-                              enterKeyHint="send"
-                              className={field}
-                            />
-                            <p className="mt-2 text-sm leading-snug opacity-60">
-                              Only if you want a reply. Never shown. Your answer appears on the wall with your first name if you add one.
-                            </p>
+                          {!mine && (
+                            <div>
+                              <label htmlFor="hi-email" className={`${label} opacity-70`}>
+                                Email (optional)
+                              </label>
+                              <input
+                                id="hi-email"
+                                type="email"
+                                name="email"
+                                maxLength={120}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                inputMode="email"
+                                autoComplete="email"
+                                autoCapitalize="none"
+                                autoCorrect="off"
+                                spellCheck={false}
+                                enterKeyHint="send"
+                                className={field}
+                              />
+                              <p className="mt-2 text-sm leading-snug opacity-60">
+                                Only if you want a reply. Never shown. Your answer appears on the wall with your first name if you add one.
+                              </p>
+                            </div>
+                          )}
+                          <div className="grid grid-cols-[1fr_auto] gap-3">
+                            <button
+                              type="submit"
+                              disabled={busy !== null || !custom.trim()}
+                              className="min-h-[52px] w-full bg-[#f3eee6] px-6 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#13110f] active:bg-white disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e2a15a]"
+                            >
+                              {busy ? "Sending…" : mine ? "Save" : "Send"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={closeCustom}
+                              disabled={busy !== null}
+                              className="min-h-[52px] border border-white/25 px-5 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                            >
+                              Cancel
+                            </button>
                           </div>
-                          <button
-                            type="submit"
-                            disabled={busy !== null || !custom.trim()}
-                            className="min-h-[52px] w-full bg-[#f3eee6] px-6 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#13110f] active:bg-white disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e2a15a]"
-                          >
-                            {busy ? "Sending…" : "Send"}
-                          </button>
                         </form>
                       ) : (
-                        <button type="button" onClick={openCustom} className={outlined}>
+                        <button type="button" onClick={openCustom} aria-expanded={false} className={outlined}>
                           Something else
                         </button>
                       )
@@ -411,7 +545,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
 
         {/* 4. The wall of answers, revealed once answered */}
         <AnimatePresence>
-          {answered && backendEnabled && wall && (
+          {mine && backendEnabled && wall && (
             <motion.section
               key="wall"
               aria-label="What others said"

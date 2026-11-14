@@ -62,7 +62,6 @@ const safeStorage = {
 
 export const localFlags = {
   scanKey: (card: number) => `hi:scan:${card}`,
-  answeredKey: (card: number) => `hi:answered:${card}`,
   get: safeStorage.get,
   set: safeStorage.set,
 };
@@ -91,6 +90,46 @@ export async function loadScan(card: number): Promise<ScanResult | null> {
 }
 
 // ---------------------------------------------------------------- answers
+/** What this browser remembers about its own answer to a card. */
+export type MyAnswer = { token: string; answer: string; firstName: string };
+
+const mineKey = (card: number) => `hi:mine:${card}`;
+
+export function readMine(card: number): MyAnswer | null {
+  try {
+    const raw = localFlags.get(mineKey(card));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<MyAnswer>;
+    if (typeof parsed.token === "string" && typeof parsed.answer === "string") {
+      return { token: parsed.token, answer: parsed.answer, firstName: parsed.firstName ?? "" };
+    }
+  } catch {
+    /* corrupt value: treat as no answer */
+  }
+  return null;
+}
+
+function writeMine(card: number, value: MyAnswer | null) {
+  try {
+    if (value) window.localStorage.setItem(mineKey(card), JSON.stringify(value));
+    else window.localStorage.removeItem(mineKey(card));
+  } catch {
+    /* private mode: edits still work this visit */
+  }
+}
+
+/** Random secret that proves ownership of an answer. Never displayed, never readable back. */
+function newToken(): string {
+  const c = typeof crypto !== "undefined" ? crypto : undefined;
+  if (c?.randomUUID) return c.randomUUID();
+  const b = new Uint8Array(16);
+  c?.getRandomValues ? c.getRandomValues(b) : b.forEach((_, i) => (b[i] = Math.floor(Math.random() * 256)));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
 export type NewAnswer = {
   card: number;
   questionId: string;
@@ -99,8 +138,10 @@ export type NewAnswer = {
   email?: string;
 };
 
-export async function submitAnswer(input: NewAnswer): Promise<boolean> {
-  if (!backendEnabled) return false;
+/** CREATE. Returns the saved record, or null on failure. */
+export async function submitAnswer(input: NewAnswer, existingToken?: string): Promise<MyAnswer | null> {
+  if (!backendEnabled) return null;
+  const token = existingToken ?? newToken();
   try {
     const supabase = await getClient();
     // No .select(): anon cannot read the answers table, and must not try.
@@ -112,10 +153,52 @@ export async function submitAnswer(input: NewAnswer): Promise<boolean> {
         first_name: input.firstName?.trim().slice(0, 40) || null,
         email: input.email?.trim().slice(0, 120) || null,
         is_public: true,
+        owner_token: token,
       }),
     );
+    if (error) return null;
+    const mine = { token, answer: input.answer.slice(0, 140), firstName: input.firstName?.trim().slice(0, 40) ?? "" };
+    writeMine(input.card, mine);
+    return mine;
+  } catch {
+    return null;
+  }
+}
+
+/** UPDATE own answer. "missing" means the row is gone (e.g. moderated), so the caller can re-create it. */
+export async function updateAnswer(
+  card: number,
+  mine: MyAnswer,
+  answer: string,
+  firstName = "",
+): Promise<"ok" | "missing" | "error"> {
+  if (!backendEnabled) return "error";
+  try {
+    const supabase = await getClient();
+    const { data, error } = await withTimeout(
+      supabase.rpc("update_my_answer", {
+        token: mine.token,
+        new_answer: answer.slice(0, 140),
+        new_first_name: firstName.trim().slice(0, 40) || null,
+      }),
+    );
+    if (error) return "error";
+    if (data !== true) return "missing";
+    writeMine(card, { token: mine.token, answer: answer.slice(0, 140), firstName: firstName.trim().slice(0, 40) });
+    return "ok";
+  } catch {
+    return "error";
+  }
+}
+
+/** DELETE own answer. Clears the local copy once the server confirms (or the row was already gone). */
+export async function removeAnswer(card: number, mine: MyAnswer): Promise<boolean> {
+  if (!backendEnabled) return false;
+  try {
+    const supabase = await getClient();
+    const { error } = await withTimeout(supabase.rpc("delete_my_answer", { token: mine.token }));
     if (error) return false;
-    localFlags.set(localFlags.answeredKey(input.card), "1");
+    writeMine(card, null);
     return true;
   } catch {
     return false;
