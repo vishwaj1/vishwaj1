@@ -72,6 +72,8 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   const reduced = useReducedMotion() ?? false;
   const card = parseCardNumber(params?.n);
   const cardLabel = card ? formatCardNumber(card) : null;
+  // Where answers are filed: the card number, or 0 for plain /hi (no card).
+  const slot = card ?? 0;
   const printed = card ? questionForCard(card) : genericQuestion;
   const [content, setContent] = useState<CardContent[] | null>(null);
 
@@ -135,7 +137,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     setEditing(false);
     setNotice("");
     trackedWall.current = false;
-    setMine(card ? readMine(card) : null);
+    setMine(readMine(slot));
     if (card) {
       loadScan(card).then((result) => {
         if (cancelled) return;
@@ -197,22 +199,22 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   /** CREATE a new answer, or UPDATE the one this browser already saved. */
   const send = useCallback(
     async (text: string, kind: "chip_answer" | "custom_answer") => {
-      if (!card || busy) return;
+      if (busy) return;
       setError("");
       setNotice("");
       setBusy(text);
       const name = kind === "custom_answer" ? firstName : mine?.firstName ?? "";
       let saved: MyAnswer | null = null;
       if (mine) {
-        const result = await updateAnswer(card, mine, text, name);
+        const result = await updateAnswer(slot, mine, text, name);
         if (result === "ok") saved = { ...mine, answer: text, firstName: name.trim() };
         // Row vanished (e.g. moderated): re-create it under the same token.
         else if (result === "missing") {
-          saved = await submitAnswer({ card, questionId: question.id, answer: text, firstName: name }, mine.token);
+          saved = await submitAnswer({ card: slot, questionId: question.id, answer: text, firstName: name }, mine.token);
         }
       } else {
         saved = await submitAnswer({
-          card,
+          card: slot,
           questionId: question.id,
           answer: text,
           firstName: kind === "custom_answer" ? firstName : undefined,
@@ -230,7 +232,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
       setCustomOpen(false);
       setCustom("");
     },
-    [card, busy, mine, question.id, cardLabel, firstName, email],
+    [slot, busy, mine, question.id, cardLabel, firstName, email],
   );
 
   function onCustomSubmit(event: FormEvent) {
@@ -281,10 +283,10 @@ export default function Hi({ params }: { params?: { n?: string } }) {
 
   /** DELETE the saved answer and return to the choices. */
   async function onRemove() {
-    if (!card || !mine || busy) return;
+    if (!mine || busy) return;
     setError("");
     setBusy("__remove");
-    const ok = await removeAnswer(card, mine);
+    const ok = await removeAnswer(slot, mine);
     setBusy(null);
     if (!ok) {
       setError("That didn't go through. Check your connection and try again.");
@@ -428,7 +430,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                     const current = editing && mine?.answer === chip;
                     return (
                       <li key={chip}>
-                        {backendEnabled && card ? (
+                        {backendEnabled ? (
                           <button
                             type="button"
                             disabled={busy !== null}
@@ -451,7 +453,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                   })}
                 </ul>
 
-                {backendEnabled && card ? (
+                {backendEnabled ? (
                   customOpen ? (
                     <form
                       onSubmit={onCustomSubmit}
