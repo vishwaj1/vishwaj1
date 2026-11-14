@@ -355,29 +355,13 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                   </p>
                   <p className="mt-2 break-words opacity-70">You said: “{mine.answer}”</p>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={startEditing}
-                    disabled={busy !== null}
-                    className="flex min-h-[48px] items-center justify-center border border-white/25 px-3 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
-                  >
-                    Change
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void onRemove()}
-                    disabled={busy !== null}
-                    className="flex min-h-[48px] items-center justify-center border border-white/25 px-3 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
-                  >
-                    {busy === "__remove" ? "Removing…" : "Remove"}
-                  </button>
-                </div>
-                {error && (
-                  <p role="alert" className="mt-3 text-base leading-snug">
-                    {error}
-                  </p>
-                )}
+                <button
+                  type="button"
+                  onClick={startEditing}
+                  className="mt-4 flex min-h-[48px] w-full items-center justify-center border border-white/25 px-3 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                >
+                  Change my answer
+                </button>
               </motion.div>
             ) : (
               <motion.div key="chips" exit={reduced ? undefined : { opacity: 0 }} transition={{ duration: 0.15 }}>
@@ -537,6 +521,16 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                   <p role="alert" className="mt-3 text-base leading-snug">
                     {error}
                   </p>
+                )}
+                {editing && mine && (
+                  <button
+                    type="button"
+                    onClick={() => void onRemove()}
+                    disabled={busy !== null}
+                    className="mt-3 min-h-[44px] w-full text-[12px] uppercase tracking-[0.16em] opacity-70 underline underline-offset-4 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                  >
+                    {busy === "__remove" ? "Removing…" : "Remove my answer instead"}
+                  </button>
                 )}
               </motion.div>
             )}
