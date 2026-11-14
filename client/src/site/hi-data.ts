@@ -82,6 +82,12 @@ export async function loadScan(card: number): Promise<ScanResult | null> {
       supabase.rpc("register_scan", { card, record: isNew }),
     );
     if (error || typeof data !== "number") return null;
+    // A remembered scan that the server no longer has (e.g. data was reset): count this visit again.
+    if (!isNew && data < 1) {
+      const retry = await withTimeout(supabase.rpc("register_scan", { card, record: true }));
+      if (retry.error || typeof retry.data !== "number") return null;
+      return { count: retry.data, isNew: true };
+    }
     if (isNew) localFlags.set(localFlags.scanKey(card), String(data));
     return { count: data, isNew };
   } catch {

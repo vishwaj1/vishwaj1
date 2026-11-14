@@ -69,9 +69,11 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   const card = parseCardNumber(params?.n);
   const cardLabel = card ? formatCardNumber(card) : null;
   const question = card ? questionForCard(card) : genericQuestion;
+  const givenName = person.name.split(" ")[0];
   const cardUrl = `${SITE_ORIGIN}/hi${card ? `/${cardLabel}` : ""}`;
 
   const [scan, setScan] = useState<ScanResult | null>(null);
+  const [scanFailed, setScanFailed] = useState(false);
   const [mine, setMine] = useState<MyAnswer | null>(null); // this browser's own saved answer
   const [editing, setEditing] = useState(false); // changing an existing answer
   const [notice, setNotice] = useState("");
@@ -83,10 +85,10 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   const [email, setEmail] = useState("");
   const [wall, setWall] = useState<WallEntry[] | null>(null);
   const [shareNote, setShareNote] = useState("");
-  const [barVisible, setBarVisible] = useState(false);
+  const [connectInView, setConnectInView] = useState(false);
   const [typing, setTyping] = useState(false);
 
-  const heroRef = useRef<HTMLDivElement>(null);
+  const connectRef = useRef<HTMLDivElement>(null);
   const customRef = useRef<HTMLInputElement>(null);
   const trackedWall = useRef(false);
 
@@ -99,6 +101,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
 
     let cancelled = false;
     setScan(null);
+    setScanFailed(false);
     setWall(null);
     setError("");
     setCustomOpen(false);
@@ -108,7 +111,9 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     setMine(card ? readMine(card) : null);
     if (card) {
       loadScan(card).then((result) => {
-        if (!cancelled) setScan(result);
+        if (cancelled) return;
+        setScan(result);
+        setScanFailed(result === null);
       });
     }
     return () => {
@@ -135,20 +140,18 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     };
   }, [mineSignature, question.id, cardLabel]);
 
-  // Sticky bar: appears once the hero has scrolled out of view.
+  // Sticky bar is always available, except while the inline connect button is on screen
+  // (so there is only ever one amber action in view) or while a text field is focused.
   useEffect(() => {
-    const node = heroRef.current;
+    const node = connectRef.current;
     if (!node || typeof IntersectionObserver === "undefined") {
-      setBarVisible(true);
+      setConnectInView(false);
       return;
     }
-    const observer = new IntersectionObserver(
-      ([entry]) => setBarVisible(!entry.isIntersecting && entry.boundingClientRect.top < 0),
-      { threshold: 0 },
-    );
+    const observer = new IntersectionObserver(([entry]) => setConnectInView(entry.isIntersecting), { threshold: 0.6 });
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [mine, editing]);
 
   // ...and hides while a text field is focused so it never fights the keyboard.
   useEffect(() => {
@@ -272,7 +275,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
 
   async function onShare() {
     track("share_clicked", { card: cardLabel });
-    const text = `I got a card from Vishwanth Reddy Jakka. It asks: "${question.text}"`;
+    const text = `I got a card from ${givenName}. It asks: "${question.text}"`;
     try {
       if (typeof navigator.share === "function") {
         await navigator.share({ title: cardLabel ? `Card no. ${cardLabel}` : "Hi", text, url: cardUrl });
@@ -297,69 +300,78 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     transition: { duration: 0.22, delay: reduced ? 0 : delay, ease: [0.22, 1, 0.36, 1] as const },
   });
 
+  const textLink =
+    "inline-flex min-h-[44px] items-center text-[12px] uppercase tracking-[0.16em] underline underline-offset-4 opacity-80 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]";
+  const chipClass =
+    "min-h-[56px] w-full border px-4 py-3 text-left text-lg leading-snug transition-colors duration-150 active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a] disabled:opacity-60";
+  const connectLink =
+    "flex min-h-[52px] w-full items-center justify-center bg-[#e2a15a] px-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#1c1917] active:bg-[#efb56e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3eee6]";
+  const onLinkedIn = () => track("linkedin_clicked", { card: cardLabel });
+  const showAnswered = Boolean(mine) && !editing;
+
   return (
     <div style={{ ...sans, color: "#f3eee6" }} className="min-h-[100svh] overflow-x-clip bg-[#13110f]">
       <main className="mx-auto w-full max-w-[640px] px-[max(1.25rem,env(safe-area-inset-left))] pb-[calc(7rem+env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-12">
-        {/* 1 + 2. Hero: identity strip and the card moment */}
-        <div ref={heroRef}>
-          <motion.header {...fade(0)} className="flex items-center gap-4">
-            <img
-              src={photoSmall}
-              width={56}
-              height={56}
-              alt=""
-              decoding="async"
-              fetchPriority="high"
-              className="h-14 w-14 shrink-0 rounded-full object-cover"
-            />
-            <div className="min-w-0">
-              <p className="text-2xl leading-none tracking-[-0.01em]" style={display}>
-                {person.name}
-              </p>
-              <p className={`mt-2 ${label} opacity-70`}>Software Engineer</p>
-            </div>
-          </motion.header>
-          <motion.p {...fade(0.05)} className="mt-3 text-base leading-snug opacity-80">
-            {person.line}
-          </motion.p>
+        {/* Who is this from: one quiet line, enough context for a secondhand card */}
+        <motion.header {...fade(0)} className="flex items-center gap-3 text-[13px] leading-none">
+          <img
+            src={photoSmall}
+            width={32}
+            height={32}
+            alt=""
+            decoding="async"
+            fetchPriority="high"
+            className="h-8 w-8 shrink-0 rounded-full object-cover"
+          />
+          <p className="min-w-0 truncate opacity-90">
+            From {givenName} <span className="opacity-60">·</span> Software Engineer
+          </p>
+        </motion.header>
 
-          <motion.section {...fade(0.1)} className="mt-7 border-t border-white/15 pt-5" aria-labelledby="card-q">
-            <p className={`${label} opacity-70`}>{cardLabel ? `Card no. ${cardLabel}` : "Hi, nice to meet you"}</p>
-            {backendEnabled && card && (
-              <p className="mt-2 min-h-[1.5rem] text-[15px] leading-6 text-[#e2a15a]" aria-live="polite">
-                {scan && (
-                  <CountUp to={scan.count} reduced={reduced} render={(n) => scanCopy(scan, n)} />
-                )}
+        {/* The card moment: number, scan line, question */}
+        <motion.section {...fade(0.08)} className="mt-6" aria-labelledby="card-q">
+          {cardLabel ? (
+            <>
+              <p className={`${label} opacity-70`}>Card no.</p>
+              <p
+                aria-label={`Card number ${cardLabel}`}
+                className="mt-1 text-[clamp(3.5rem,min(22vw,11svh),7.5rem)] leading-[0.9] tracking-[-0.03em] sm:text-[7.5rem]"
+                style={display}
+              >
+                {cardLabel}
               </p>
-            )}
-            <h1 id="card-q" className="mt-3 text-[2rem] leading-[1.1] tracking-[-0.01em] sm:text-5xl" style={display}>
-              {question.text}
-            </h1>
-          </motion.section>
-        </div>
+            </>
+          ) : (
+            <p className={`${label} opacity-70`}>Hi, nice to meet you</p>
+          )}
+          {backendEnabled && card && !scanFailed && (
+            <p className="mt-3 min-h-[1.5rem] text-[15px] leading-6 opacity-70" aria-live="polite">
+              {scan && <CountUp to={scan.count} reduced={reduced} render={(n) => scanCopy(scan, n)} />}
+            </p>
+          )}
+          <h1 id="card-q" className="mt-3 text-[1.875rem] leading-[1.1] tracking-[-0.01em] sm:text-5xl" style={display}>
+            {question.text}
+          </h1>
+        </motion.section>
 
-        {/* 3. Chips, then inline confirmation (with change / remove) */}
+        {/* Answer: chips, then confirmation */}
         <section className="mt-6" aria-label="Answer">
           <AnimatePresence mode="wait" initial={false}>
-            {mine && !editing ? (
+            {showAnswered && mine ? (
               <motion.div
                 key="thanks"
                 initial={reduced ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
-                className="border border-white/25 px-4 py-5"
+                className="border border-[#f3eee6] px-4 py-5"
               >
                 <div role="status">
                   <p className="text-2xl leading-snug" style={display}>
-                    Thank you. That's in.
+                    That's in. Thank you.
                   </p>
                   <p className="mt-2 break-words opacity-70">You said: “{mine.answer}”</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={startEditing}
-                  className="mt-4 flex min-h-[48px] w-full items-center justify-center border border-white/25 px-3 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
-                >
+                <button type="button" onClick={startEditing} className={`${textLink} mt-2`}>
                   Change my answer
                 </button>
               </motion.div>
@@ -371,13 +383,9 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                   </p>
                 )}
                 {editing && mine && (
-                  <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="mb-3 flex items-center justify-between gap-3">
                     <p className={`${label} opacity-70`}>Changing your answer</p>
-                    <button
-                      type="button"
-                      onClick={cancelEditing}
-                      className="min-h-[44px] px-2 text-[12px] uppercase tracking-[0.16em] text-[#f3eee6] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
-                    >
+                    <button type="button" onClick={cancelEditing} className={textLink}>
                       Keep mine
                     </button>
                   </div>
@@ -393,141 +401,139 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                             disabled={busy !== null}
                             aria-pressed={current || undefined}
                             onClick={() => void send(chip, "chip_answer")}
-                            className={`min-h-[56px] w-full border px-4 py-3 text-left text-lg leading-snug transition-colors duration-150 active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a] disabled:opacity-60 ${
-                              busy === chip || current ? "border-[#f3eee6] bg-white/10" : "border-white/25"
-                            }`}
+                            className={`${chipClass} ${busy === chip || current ? "border-[#f3eee6] bg-white/10" : "border-white/25"}`}
                             style={display}
                           >
                             {chip}
-                            {current && <span className={`ml-3 ${label} opacity-70`}>Your answer</span>}
+                            {busy === chip && <span className={`ml-3 ${label} opacity-70`}>Sending…</span>}
+                            {current && busy !== chip && <span className={`ml-3 ${label} opacity-70`}>Your answer</span>}
                           </button>
                         ) : (
-                          <a
-                            href={mailto(chip)}
-                            className="flex min-h-[56px] w-full items-center border border-white/25 px-4 py-3 text-lg leading-snug active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
-                            style={display}
-                          >
+                          <a href={mailto(chip)} className={`${chipClass} flex items-center border-white/25`} style={display}>
                             {chip}
                           </a>
                         )}
                       </li>
                     );
                   })}
-                  <li>
-                    {backendEnabled && card ? (
-                      customOpen ? (
-                        <form
-                          onSubmit={onCustomSubmit}
-                          onKeyDown={(e) => e.key === "Escape" && closeCustom()}
-                          className="space-y-4 border border-white/25 p-4"
-                        >
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <label htmlFor="hi-custom" className={`${label} opacity-70`}>
-                                Your answer
-                              </label>
-                              <span className={`${label} tabular-nums opacity-60`}>{custom.length}/140</span>
-                            </div>
-                            <input
-                              id="hi-custom"
-                              ref={customRef}
-                              autoFocus
-                              type="text"
-                              name="answer"
-                              maxLength={140}
-                              required
-                              value={custom}
-                              onChange={(e) => setCustom(e.target.value)}
-                              autoComplete="off"
-                              autoCapitalize="sentences"
-                              enterKeyHint="send"
-                              placeholder="One line"
-                              className={field}
-                            />
-                          </div>
-                          <div>
-                            <label htmlFor="hi-first" className={`${label} opacity-70`}>
-                              First name (optional)
-                            </label>
-                            <input
-                              id="hi-first"
-                              type="text"
-                              name="first_name"
-                              maxLength={40}
-                              value={firstName}
-                              onChange={(e) => setFirstName(e.target.value)}
-                              autoComplete="given-name"
-                              autoCapitalize="words"
-                              enterKeyHint={mine ? "send" : "next"}
-                              className={field}
-                            />
-                          </div>
-                          {!mine && (
-                            <div>
-                              <label htmlFor="hi-email" className={`${label} opacity-70`}>
-                                Email (optional)
-                              </label>
-                              <input
-                                id="hi-email"
-                                type="email"
-                                name="email"
-                                maxLength={120}
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                inputMode="email"
-                                autoComplete="email"
-                                autoCapitalize="none"
-                                autoCorrect="off"
-                                spellCheck={false}
-                                enterKeyHint="send"
-                                className={field}
-                              />
-                              <p className="mt-2 text-sm leading-snug opacity-60">
-                                Only if you want a reply. Never shown. Your answer appears on the wall with your first name if you add one.
-                              </p>
-                            </div>
-                          )}
-                          <div className="grid grid-cols-[1fr_auto] gap-3">
-                            <button
-                              type="submit"
-                              disabled={busy !== null || !custom.trim()}
-                              className="min-h-[52px] w-full bg-[#f3eee6] px-6 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#13110f] active:bg-white disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e2a15a]"
-                            >
-                              {busy ? "Sending…" : mine ? "Save" : "Send"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={closeCustom}
-                              disabled={busy !== null}
-                              className="min-h-[52px] border border-white/25 px-5 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </form>
-                      ) : (
-                        <button type="button" onClick={openCustom} aria-expanded={false} className={outlined}>
-                          Something else
-                        </button>
-                      )
-                    ) : (
-                      <a href={mailto()} className={outlined}>
-                        Something else
-                      </a>
-                    )}
-                  </li>
                 </ul>
+
+                {backendEnabled && card ? (
+                  customOpen ? (
+                    <form
+                      onSubmit={onCustomSubmit}
+                      onKeyDown={(e) => e.key === "Escape" && closeCustom()}
+                      className="mt-3 space-y-4 border border-white/25 p-4"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="hi-custom" className={`${label} opacity-70`}>
+                            Your answer
+                          </label>
+                          <span className={`${label} tabular-nums opacity-60`}>{custom.length}/140</span>
+                        </div>
+                        <input
+                          id="hi-custom"
+                          ref={customRef}
+                          autoFocus
+                          type="text"
+                          name="answer"
+                          maxLength={140}
+                          required
+                          value={custom}
+                          onChange={(e) => setCustom(e.target.value)}
+                          autoComplete="off"
+                          autoCapitalize="sentences"
+                          enterKeyHint="send"
+                          placeholder="One line"
+                          className={field}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="hi-first" className={`${label} opacity-70`}>
+                          First name (optional)
+                        </label>
+                        <input
+                          id="hi-first"
+                          type="text"
+                          name="first_name"
+                          maxLength={40}
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          autoComplete="given-name"
+                          autoCapitalize="words"
+                          enterKeyHint={mine ? "send" : "next"}
+                          className={field}
+                        />
+                      </div>
+                      {!mine && (
+                        <div>
+                          <label htmlFor="hi-email" className={`${label} opacity-70`}>
+                            Email (optional)
+                          </label>
+                          <input
+                            id="hi-email"
+                            type="email"
+                            name="email"
+                            maxLength={120}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            inputMode="email"
+                            autoComplete="email"
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                            spellCheck={false}
+                            enterKeyHint="send"
+                            className={field}
+                          />
+                          <p className="mt-2 text-sm leading-snug opacity-60">
+                            Only if you want a reply. Never shown. Your answer appears on the wall with your first name if you add one.
+                          </p>
+                        </div>
+                      )}
+                      <div className="grid grid-cols-[1fr_auto] gap-3">
+                        <button
+                          type="submit"
+                          disabled={busy !== null || !custom.trim()}
+                          className="min-h-[52px] w-full bg-[#f3eee6] px-6 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#13110f] active:bg-white disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e2a15a]"
+                        >
+                          {busy ? "Sending…" : mine ? "Save" : "Send"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={closeCustom}
+                          disabled={busy !== null}
+                          className="min-h-[52px] border border-white/25 px-5 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <button type="button" onClick={openCustom} className={`${textLink} mt-2`}>
+                      Or write your own
+                    </button>
+                  )
+                ) : (
+                  <a href={mailto()} className={`${textLink} mt-2`}>
+                    Or write your own
+                  </a>
+                )}
+
                 {error && (
-                  <p role="alert" className="mt-3 text-base leading-snug">
-                    {error}
-                  </p>
+                  <div role="alert" className="mt-3 text-base leading-snug">
+                    <p style={display}>{error}</p>
+                    <a href={mailto(custom)} className={`${textLink} mt-1`}>
+                      Or email your answer
+                    </a>
+                  </div>
                 )}
                 {editing && mine && (
                   <button
                     type="button"
                     onClick={() => void onRemove()}
                     disabled={busy !== null}
-                    className="mt-3 min-h-[44px] w-full text-[12px] uppercase tracking-[0.16em] opacity-70 underline underline-offset-4 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                    className={`${textLink} mt-3 w-full justify-center opacity-60 disabled:opacity-40`}
                   >
                     {busy === "__remove" ? "Removing…" : "Remove my answer instead"}
                   </button>
@@ -537,51 +543,66 @@ export default function Hi({ params }: { params?: { n?: string } }) {
           </AnimatePresence>
         </section>
 
-        {/* 4. The wall of answers, revealed once answered */}
+        {/* Convert: your line is the reason to connect. Only one amber action is ever on screen. */}
         <AnimatePresence>
-          {mine && backendEnabled && wall && (
+          {showAnswered && (
+            <motion.div
+              key="connect"
+              ref={connectRef}
+              initial={reduced ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.22, delay: reduced ? 0 : 0.1 }}
+              className="mt-8"
+            >
+              <p className="text-[1.5rem] leading-[1.2]" style={display}>
+                {person.line}
+              </p>
+              <a href={person.linkedin} target="_blank" rel="noreferrer" onClick={onLinkedIn} className={`${connectLink} mt-4`}>
+                Connect on LinkedIn
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* The wall, once answered */}
+        <AnimatePresence>
+          {mine && backendEnabled && wall && wall.length > 0 && (
             <motion.section
               key="wall"
-              aria-label="What others said"
+              aria-label="On the wall"
               initial={reduced ? false : { height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               className="overflow-hidden"
             >
-              <div className="mt-8">
-                <p className={`${label} opacity-60`}>What others said</p>
-                {wall.length === 0 ? (
-                  <p className="mt-4 text-2xl leading-snug" style={display}>
-                    Nobody's answered this one yet. You're first. Others will show up here.
-                  </p>
-                ) : (
-                  <ul className="mt-4 divide-y divide-white/10">
-                    {wall.map((entry, index) => (
-                      <li key={`${entry.created_at}-${index}`} className="py-4">
-                        <p className="text-xl leading-snug" style={display}>
-                          {entry.answer}
+              <div className="mt-10">
+                <p className={`${label} opacity-60`}>On the wall</p>
+                <ul className="mt-3 divide-y divide-white/10">
+                  {wall.map((entry, index) => (
+                    <li key={`${entry.created_at}-${index}`} className="py-4">
+                      <p className="break-words text-xl leading-snug" style={display}>
+                        {entry.answer}
+                      </p>
+                      {(entry.first_name || entry.city) && (
+                        <p className={`mt-2 ${label} opacity-60`}>
+                          {[entry.first_name, entry.city].filter(Boolean).join(", ")}
                         </p>
-                        {(entry.first_name || entry.city) && (
-                          <p className={`mt-2 ${label} opacity-60`}>
-                            {[entry.first_name, entry.city].filter(Boolean).join(", ")}
-                          </p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                      )}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </motion.section>
           )}
         </AnimatePresence>
 
-        {/* 5. Pass it on */}
+        {/* Spread */}
         <section className="mt-12 border-t border-white/15 pt-6" aria-label="Pass it on">
           <p className={`${label} opacity-60`}>Pass it on</p>
-          <p className="mt-3 text-2xl leading-snug" style={display}>
+          <p className="mt-3 text-xl leading-snug" style={display}>
             Know someone building something hard? Send them this.
           </p>
-          <button type="button" onClick={onShare} className={`${outlined} mt-5`}>
+          <button type="button" onClick={onShare} className={`${outlined} mt-4`}>
             Share this card
           </button>
           {shareNote && (
@@ -591,26 +612,25 @@ export default function Hi({ params }: { params?: { n?: string } }) {
           )}
         </section>
 
-        {/* 6. Who I am */}
+        {/* Who I am: three short beats from copy.ts */}
         <section className="mt-12 border-t border-white/15 pt-6" aria-label="Who I am">
           <p className={`${label} opacity-60`}>Who I am</p>
-          <div className="mt-5 space-y-7">
+          <dl className="mt-4 space-y-5">
             {lexsyBeats.slice(0, 3).map((beat) => (
-              <article key={beat.kicker}>
-                <p className={`${label} text-[#f3eee6]/60`}>{beat.kicker}</p>
-                <h2 className="mt-2 text-3xl leading-[1.05]" style={display}>
+              <div key={beat.kicker}>
+                <dt className={`${label} opacity-60`}>{beat.kicker}</dt>
+                <dd className="mt-1 text-2xl leading-[1.15]" style={display}>
                   {beat.title}
-                </h2>
-                <p className="mt-2 text-base leading-relaxed opacity-75">{beat.body}</p>
-              </article>
+                </dd>
+              </div>
             ))}
-          </div>
+          </dl>
         </section>
 
-        {/* 7. Footer actions (secondary to the sticky bar) */}
-        <nav className="mt-12 grid gap-3 sm:grid-cols-2" aria-label="More ways to reach me">
+        {/* Quiet links */}
+        <nav className="mt-10 flex flex-wrap gap-x-6" aria-label="More ways to reach me">
           <a
-            className={outlined}
+            className={textLink}
             href={person.calendly}
             target="_blank"
             rel="noreferrer"
@@ -618,13 +638,13 @@ export default function Hi({ params }: { params?: { n?: string } }) {
           >
             Book a call
           </a>
-          <a className={outlined} href={person.resume} target="_blank" rel="noreferrer">
+          <a className={textLink} href={person.resume} target="_blank" rel="noreferrer">
             Resume
           </a>
-          <a className={outlined} href={`mailto:${person.email}`}>
+          <a className={textLink} href={`mailto:${person.email}`}>
             Email
           </a>
-          <a className={outlined} href={person.github} target="_blank" rel="noreferrer">
+          <a className={textLink} href={person.github} target="_blank" rel="noreferrer">
             GitHub
           </a>
         </nav>
@@ -632,16 +652,16 @@ export default function Hi({ params }: { params?: { n?: string } }) {
         {/* TODO: "where this card has been" travel map. The scans table is ready for it
             (add a nullable city / lat / lng captured at scan time, expose via a view). */}
 
-        <footer className="mt-10 border-t border-white/10 pt-4">
+        <footer className="mt-6 border-t border-white/10 pt-2">
           <Link href="/" className={`inline-flex min-h-[44px] items-center ${label} opacity-70 hover:opacity-100`}>
             See the main site
           </Link>
         </footer>
       </main>
 
-      {/* Sticky bar: exactly one action. */}
+      {/* Sticky bar: exactly one action, hidden while typing or while the inline connect is on screen. */}
       <AnimatePresence>
-        {barVisible && !typing && (
+        {!typing && !customOpen && !connectInView && (
           <motion.div
             key="bar"
             initial={reduced ? false : { y: "100%" }}
@@ -654,8 +674,8 @@ export default function Hi({ params }: { params?: { n?: string } }) {
               href={person.linkedin}
               target="_blank"
               rel="noreferrer"
-              onClick={() => track("linkedin_clicked", { card: cardLabel })}
-              className="mx-auto flex min-h-[52px] w-full max-w-[640px] items-center justify-center bg-[#e2a15a] px-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#1c1917] active:bg-[#efb56e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3eee6]"
+              onClick={onLinkedIn}
+              className={`${connectLink} mx-auto max-w-[640px]`}
             >
               Connect on LinkedIn
             </a>

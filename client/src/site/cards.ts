@@ -18,14 +18,14 @@ const work: Question[] = [
   { id: "hardest-thing", text: "What is the hardest thing you are working on this month?", chips: ["Getting people to agree", "A deadline that won't move", "Finding the real problem"] },
   { id: "tool-wish", text: "What tool do you wish existed at work?", chips: ["One search for everything", "Meeting notes that act", "Undo for everything"] },
   { id: "spreadsheet", text: "What does your team do in a spreadsheet that it should not?", chips: ["Run the whole company", "Track customers", "Plan the roadmap"] },
-  { id: "shipped-lately", text: "What is the best thing you have shipped lately?", chips: ["A tiny fix that mattered", "A feature nobody asked for", "Something I'm proud of"] },
-  { id: "day-one", text: "What would you hand a new hire on day one?", chips: ["The scary legacy code", "A real, small win", "The docs I never wrote"] },
+  { id: "shipped-lately", text: "What is the best thing you have shipped lately?", chips: ["A tiny fix that mattered", "A feature nobody asked for", "The thing I almost didn't ship"] },
+  { id: "day-one", text: "What would you hand a new hire on day one?", chips: ["The scary legacy code", "One small, real win", "The docs I never wrote"] },
   { id: "keeps-returning", text: "What problem keeps coming back no matter how often you fix it?", chips: ["Flaky anything", "Unclear ownership", "Same bug, new costume"] },
 ];
 
 const human: Question[] = [
   { id: "free-week", text: "What would you build with one free week?", chips: ["Something useless and beautiful", "The thing at work nobody will fund", "Finally finish an old project"] },
-  { id: "recently-learned", text: "What is something you learned recently that surprised you?", chips: ["Sleep beats caffeine", "Asking beats guessing", "Something about myself"] },
+  { id: "recently-learned", text: "What is something you learned recently that surprised you?", chips: ["Sleep beats caffeine", "Asking beats guessing", "I need less than I think"] },
   { id: "small-win-week", text: "What is a small thing that made your week better?", chips: ["A really good coffee", "A walk outside", "A friend's random text"] },
   { id: "taught-me-work", text: "Who taught you the most about how to work?", chips: ["A tough manager", "A patient teammate", "My parents"] },
   { id: "outside-skill", text: "What is a skill you picked up outside of work?", chips: ["Cooking for crowds", "Something with my hands", "Another language"] },
@@ -33,7 +33,7 @@ const human: Question[] = [
   { id: "looking-forward", text: "What are you looking forward to this year?", chips: ["One big trip", "Shipping something big", "Honestly, rest"] },
   { id: "comfort-media", text: "What is a book, show or song you keep coming back to?", chips: ["A comfort show", "One album on repeat", "A book I reread"] },
   { id: "age-ten", text: "What did you want to be when you were ten?", chips: ["An astronaut", "A pro athlete", "A game designer"] },
-  { id: "quiet-pride", text: "What is something you are proud of that nobody asked about?", chips: ["Something I finished", "How I handled a hard day", "A quiet personal win"] },
+  { id: "quiet-pride", text: "What is something you are proud of that nobody asked about?", chips: ["A hard thing I finished", "How I handled a bad day", "A quiet personal win"] },
   { id: "best-meal", text: "What is the best meal you have had this year?", chips: ["Something my family made", "Street food", "A random Tuesday dinner"] },
   { id: "go-back", text: "What is a place you would go back to tomorrow?", chips: ["A beach, any beach", "Somewhere with mountains", "My hometown"] },
   { id: "ask-me-more", text: "What is a question you wish people asked you more?", chips: ["How are you, really?", "What are you building?", "What's next for you?"] },
