@@ -142,7 +142,7 @@ export default function Home() {
       ) : (
         <main id="top" className="mx-auto max-w-6xl px-[max(1.125rem,env(safe-area-inset-left))] pb-[max(3rem,env(safe-area-inset-bottom))] sm:px-8">
           {/* Hero */}
-          <section className="grid gap-10 pb-14 pt-8 sm:pt-12 lg:grid-cols-[1.4fr_0.8fr] lg:items-center lg:gap-14 lg:pb-20 lg:pt-16">
+          <section className="grid gap-8 pb-14 pt-8 sm:grid-cols-[1.5fr_1fr] sm:items-center sm:gap-10 sm:pt-12 lg:grid-cols-[1.4fr_0.8fr] lg:gap-14 lg:pb-20 lg:pt-16">
             <div>
               <motion.p {...fade(0)} className={`${mono} inline-block border border-[#3a352f] px-2.5 py-1.5 text-[12px] lowercase text-[#c9c2b5]`}>
                 {status}
@@ -154,7 +154,7 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={reduced ? undefined : { opacity: 0, y: -6 }}
                   transition={{ duration: 0.2 }}
-                  className="mt-5 max-w-3xl text-[clamp(2.75rem,11.5vw,5.4rem)] leading-[0.95] tracking-[-0.01em] text-[#f6f1e7]"
+                  className="mt-5 max-w-3xl text-[clamp(2.75rem,11.5vw,5.4rem)] leading-[0.95] sm:text-[clamp(2.75rem,6.6vw,5.4rem)] tracking-[-0.01em] text-[#f6f1e7]"
                   style={serif}
                 >
                   {mode === "short" ? (
@@ -204,14 +204,14 @@ export default function Home() {
               </div>
             </div>
 
-            <motion.figure {...fade(0.08)} className="w-[62%] max-w-[260px] lg:w-full lg:max-w-none">
+            <motion.figure {...fade(0.08)} className="w-full">
               <img
                 src={person.photo}
                 alt={person.name}
                 width={800}
                 height={1000}
                 decoding="async"
-                className="aspect-[4/5] w-full object-cover object-[center_20%]"
+                className="aspect-[5/4] w-full object-cover object-[center_30%] sm:aspect-[4/5] sm:object-[center_20%]"
               />
               <figcaption className={`${label} mt-2 flex justify-between`}>
                 <span>vishwanth reddy</span>
@@ -228,11 +228,11 @@ export default function Home() {
             <div className="mt-4 grid gap-px bg-[#2a2622] md:grid-cols-3">
               {proofs.map((proof, index) => (
                 <article key={proof.org} className="bg-[#0c0b09] py-6 md:px-6 md:first:pl-0">
-                  <p className={`${label} flex justify-between gap-3`}>
-                    <span className="text-[#d4845a]">
+                  <p className={`${label} flex flex-wrap justify-between gap-x-3 gap-y-1`}>
+                    <span className="whitespace-nowrap text-[#d4845a]">
                       0{index + 1} · {proof.org.toLowerCase()}
                     </span>
-                    <span>{proof.when}</span>
+                    <span className="whitespace-nowrap">{proof.when}</span>
                   </p>
                   <p className="mt-3 text-[3.5rem] leading-none text-[#f6f1e7]" style={serif}>
                     {proof.stat}
