@@ -313,7 +313,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     <div style={{ ...sans, color: "#f3eee6" }} className="min-h-[100svh] overflow-x-clip bg-[#13110f]">
       <main className="mx-auto w-full max-w-[640px] px-[max(1.25rem,env(safe-area-inset-left))] pb-[calc(7rem+env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-12">
         {/* Who is this from: one quiet line, enough context for a secondhand card */}
-        <motion.header {...fade(0)} className="flex items-center gap-3 text-[13px] leading-none">
+        <motion.header {...fade(0)} className="flex items-center gap-3 text-[13px] leading-5">
           <img
             src={photoSmall}
             width={32}
