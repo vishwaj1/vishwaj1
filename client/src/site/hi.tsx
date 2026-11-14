@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link } from "wouter";
 import { FaLinkedinIn } from "react-icons/fa";
@@ -8,6 +8,7 @@ import { person } from "./copy";
 import { formatCardNumber, genericQuestion, parseCardNumber, questionForCard } from "./cards";
 import {
   backendEnabled,
+  loadCardContent,
   loadScan,
   loadWall,
   looksProfane,
@@ -17,6 +18,7 @@ import {
   submitAnswer,
   track,
   updateAnswer,
+  type CardContent,
   type MyAnswer,
   type ScanResult,
   type WallEntry,
@@ -70,7 +72,21 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   const reduced = useReducedMotion() ?? false;
   const card = parseCardNumber(params?.n);
   const cardLabel = card ? formatCardNumber(card) : null;
-  const question = card ? questionForCard(card) : genericQuestion;
+  // Where answers are filed: the card number, or 0 for plain /hi (no card).
+  const slot = card ?? 0;
+  const printed = card ? questionForCard(card) : genericQuestion;
+  const [content, setContent] = useState<CardContent[] | null>(null);
+
+  // Supabase is the editable source for chips and my own answer; the printed
+  // text stays authoritative, since it is already ink on the card in someone's
+  // hand. Matched by id, so a reordering in the table can never swap questions.
+  const question = useMemo(() => {
+    const row = content?.find((r) => r.question_id === printed.id);
+    if (!row) return printed;
+    const chips = Array.isArray(row.chips) && row.chips.length === 3 ? (row.chips as unknown as typeof printed.chips) : printed.chips;
+    return { ...printed, chips, mine: row.mine || printed.mine };
+  }, [content, printed]);
+
   const givenName = person.name.split(" ")[0];
   const cardUrl = `${SITE_ORIGIN}/hi${card ? `/${cardLabel}` : ""}`;
 
@@ -94,6 +110,18 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   const customRef = useRef<HTMLInputElement>(null);
   const trackedWall = useRef(false);
 
+  // Editable copy from Supabase: chips and my own answer. Fire-and-forget, so
+  // nothing on the page waits for it; cards.ts has already rendered.
+  useEffect(() => {
+    let cancelled = false;
+    loadCardContent().then((rows) => {
+      if (!cancelled && rows) setContent(rows);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Title, scroll reset, scan analytics, scan counter, remembered answer.
   useEffect(() => {
     const previous = document.title;
@@ -109,7 +137,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
     setEditing(false);
     setNotice("");
     trackedWall.current = false;
-    setMine(card ? readMine(card) : null);
+    setMine(readMine(slot));
     if (card) {
       loadScan(card).then((result) => {
         if (cancelled) return;
@@ -171,22 +199,22 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   /** CREATE a new answer, or UPDATE the one this browser already saved. */
   const send = useCallback(
     async (text: string, kind: "chip_answer" | "custom_answer") => {
-      if (!card || busy) return;
+      if (busy) return;
       setError("");
       setNotice("");
       setBusy(text);
       const name = kind === "custom_answer" ? firstName : mine?.firstName ?? "";
       let saved: MyAnswer | null = null;
       if (mine) {
-        const result = await updateAnswer(card, mine, text, name);
+        const result = await updateAnswer(slot, mine, text, name);
         if (result === "ok") saved = { ...mine, answer: text, firstName: name.trim() };
         // Row vanished (e.g. moderated): re-create it under the same token.
         else if (result === "missing") {
-          saved = await submitAnswer({ card, questionId: question.id, answer: text, firstName: name }, mine.token);
+          saved = await submitAnswer({ card: slot, questionId: question.id, answer: text, firstName: name }, mine.token);
         }
       } else {
         saved = await submitAnswer({
-          card,
+          card: slot,
           questionId: question.id,
           answer: text,
           firstName: kind === "custom_answer" ? firstName : undefined,
@@ -204,7 +232,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
       setCustomOpen(false);
       setCustom("");
     },
-    [card, busy, mine, question.id, cardLabel, firstName, email],
+    [slot, busy, mine, question.id, cardLabel, firstName, email],
   );
 
   function onCustomSubmit(event: FormEvent) {
@@ -255,10 +283,10 @@ export default function Hi({ params }: { params?: { n?: string } }) {
 
   /** DELETE the saved answer and return to the choices. */
   async function onRemove() {
-    if (!card || !mine || busy) return;
+    if (!mine || busy) return;
     setError("");
     setBusy("__remove");
-    const ok = await removeAnswer(card, mine);
+    const ok = await removeAnswer(slot, mine);
     setBusy(null);
     if (!ok) {
       setError("That didn't go through. Check your connection and try again.");
@@ -372,6 +400,12 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                   </p>
                   <p className="mt-2 break-words opacity-70">You said: “{mine.answer}”</p>
                 </div>
+                <div className="mt-5 border-t border-white/20 pt-4">
+                  <p className={`${label} opacity-70`}>{givenName}’s answer</p>
+                  <p className="mt-2 break-words text-xl leading-snug text-[#f6f1e7]" style={display}>
+                    {question.mine}
+                  </p>
+                </div>
                 <button type="button" onClick={startEditing} className={`${textLink} mt-2`}>
                   Change my answer
                 </button>
@@ -396,7 +430,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                     const current = editing && mine?.answer === chip;
                     return (
                       <li key={chip}>
-                        {backendEnabled && card ? (
+                        {backendEnabled ? (
                           <button
                             type="button"
                             disabled={busy !== null}
@@ -419,7 +453,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                   })}
                 </ul>
 
-                {backendEnabled && card ? (
+                {backendEnabled ? (
                   customOpen ? (
                     <form
                       onSubmit={onCustomSubmit}

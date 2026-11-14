@@ -22,13 +22,20 @@ Forward-deployed engineer.
 - UMBC Campus Pantry (2023 to 2025): about 3,000 requests a day, error rate under 1%, API latency cut 60% (450 ms to 180 ms)
 - Polycom (2021 to 2023): reporting dashboards 35% faster; contributed to a BERT-assisted classification workflow that cut repetitive manual review by 22%
 
+## Skills
+- AI and agents: LLM agents, MCP servers, tool calling, RAG, embeddings, semantic search, structured extraction, LLM evaluation, human-in-the-loop
+- Models and AI tools: Claude, Claude Managed Agents, OpenClaw, Gemini, OpenAI, Groq, Claude Code, Cursor, Codex
+- Languages and frontend: TypeScript, JavaScript, Python, Java, SQL, React, Next.js
+- Backend and data: Node.js, NestJS, FastAPI, REST APIs, GraphQL, webhooks, PostgreSQL, Supabase, Redis, DOCX automation
+- Cloud and delivery: AWS, Docker, GitHub Actions CI/CD, monitoring, RBAC, tenant isolation
+
 ## Projects
 - Pretty Prompt: rewrites a prompt, scores it, and keeps the history. https://prettyprompt.vercel.app/
 - Web Talk: say what you want, and the browser does the next thing. https://github.com/vishwaj1/Web-Talk
 
 ## Education
 - MS in Computer Science, UMBC, 2025
-- BE, Vasavi, 2023
+- BE in Computer Science, Vasavi College of Engineering, 2023
 
 ## Best fit
 Forward-deployed or product engineering, where engineers work next to the people they build for.

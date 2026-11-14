@@ -1,0 +1,28 @@
+-- Seed of the 25 approved questions. Idempotent; does not overwrite edits to chips/mine.
+insert into public.card_content (question_id, sort_order, question, chips, mine, needs_verify) values
+('surprised', 1, 'What''s the last thing that genuinely surprised you?', array['A person','A machine','Myself'], 'How often the right fix turned out to be a conversation, not code.', false),
+('hardest-problem', 2, 'What''s the hardest problem on your plate this month?', array['People, not the work','Scope','Knowing what matters'], 'Explaining in one sentence what a forward-deployed engineer actually does.', false),
+('lost-time', 3, 'When did you last lose track of time?', array['Debugging','A conversation','A book'], 'Wiring up the twentieth tool and watching the agent finally use it right.', false),
+('small-improvement', 4, 'What''s the smallest thing that improved your week?', array['Deleting an app','A real lunch','A walk'], 'Writing the day''s three things on paper before opening the laptop.', true),
+('free-week', 5, 'What would you build with one free week?', array['Useless and beautiful','What nobody will fund','An old unfinished thing'], 'Something that reads a contract and tells you only what changed.', false),
+('overrated', 6, 'What''s overrated in your field?', array['Meetings about meetings','The newest tool','Moving fast'], 'Demos. Anyone can demo. Fifty real users is the hard part.', false),
+('skill-if-free', 7, 'What''s a skill you''d learn if time were free?', array['An instrument','A language','Something with my hands'], 'To dance.', false),
+('unreasonably-good', 8, 'What''s a small thing you''re unreasonably good at?', array['Parallel parking','Remembering names','Packing light'], 'Finding the one line in a four-hundred-line log that actually matters.', false),
+('cant-stop', 9, 'What are you working on that you can''t stop thinking about?', array['Something at work','A side project','Nothing, and that''s fine'], 'How to let an agent act without ever letting it act alone.', false),
+('curious-outside-work', 10, 'What are you curious about that has nothing to do with work?', array['Space','How cities work','Fermentation'], 'How cities decide where to put things.', true),
+('worth-slowly', 11, 'What''s worth doing slowly?', array['Hiring','Writing','Cooking'], 'Deciding what the first version is. Everything after that can be fast.', false),
+('made-by-hand', 12, 'What''s the last thing you made with your hands?', array['Food','Furniture','Nothing lately'], 'Dinner, badly.', true),
+('job-misunderstood', 13, 'What do people get wrong about your job?', array['That it''s typing','That it''s solitary','That it''s logical'], 'They think it''s building software. Most of it is working out what''s actually being asked.', false),
+('taught-me-most', 14, 'Who taught you the most, and didn''t know it?', array['A colleague','A stranger','Someone I argued with'], 'A lawyer who kept saying "that''s not how it works" until I understood why.', false),
+('nobody-uses', 15, 'What''s the best thing you''ve made that nobody uses?', array['A tool for one','A script I still use','Several, honestly'], 'A small tool I built for one person, who then changed jobs.', true),
+('five-years-ago', 16, 'What do you wish someone had told you five years ago?', array['Ask sooner','Nobody''s watching','It compounds'], 'You can just go and talk to the people who use the thing.', false),
+('automate-forever', 17, 'What''s one thing you''d automate forever?', array['Status updates','Expenses','Scheduling'], 'Chasing signatures.', false),
+('changed-mind', 18, 'What''s a belief you''ve changed your mind about?', array['How teams work','What good work is','Remote vs in person'], 'I used to think good specs came first. They come from sitting with the work.', false),
+('better-than-last-year', 19, 'What are you better at than you were a year ago?', array['Saying no','Shipping early','Listening'], 'Asking the dumb question early instead of the smart one late.', false),
+('remembered-for', 20, 'What would you want to be remembered for at work?', array['Made things easier','One thing that lasted','Being the calm one'], 'That what I built was still standing after I left.', false),
+('decade-problem', 21, 'What''s a problem you''d happily spend a decade on?', array['Making something less awful','Teaching','Something small and deep'], 'Making legal work feel less like paperwork and more like progress.', false),
+('if-nobody-judged', 22, 'What would you do differently if nobody judged it?', array['Start over','Say the obvious thing','Work less, think more'], 'Ship the rough version on day one and let people argue with it.', false),
+('ignored-advice', 23, 'What''s the best advice you ignored?', array['Play it safe','Specialize','Wait your turn'], 'Pick one stack and stay in it.', false),
+('bad-job', 24, 'What''s the most useful thing you learned from a bad job?', array['What not to do','How to leave','Who I am under pressure'], 'A process nobody questions is usually the real bug.', true),
+('this-year', 25, 'What are you hoping happens this year?', array['A change','Something steady','No idea yet'], 'Landing somewhere I get to sit with customers again.', false)
+on conflict (question_id) do nothing;
