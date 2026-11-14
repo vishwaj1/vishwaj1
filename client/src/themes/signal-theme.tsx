@@ -52,7 +52,6 @@ export function SignalTheme() {
             {person.mark} · live
           </span>
           <span className="text-[#9aa6b2]">{person.role}</span>
-          <span>{person.place}</span>
         </header>
 
         <div className="mt-6 grid flex-1 gap-6 lg:grid-cols-[280px_1fr]">

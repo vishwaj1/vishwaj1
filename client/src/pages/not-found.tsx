@@ -1,21 +1,24 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Link } from "wouter";
+import { boxSecondary, label, sans, serif } from "@/site/ui";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
-          <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">404 Page Not Found</h1>
-          </div>
-
-          <p className="mt-4 text-sm text-gray-600">
-            Did you forget to add the page to the router?
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <main
+      className="flex min-h-[100svh] flex-col justify-center bg-[#0c0b09] px-[max(1.125rem,env(safe-area-inset-left))] py-16 text-[#f3efe6]"
+      style={sans}
+    >
+      <div className="mx-auto w-full max-w-[640px]">
+        <p className={label}>404</p>
+        <h1 className="mt-3 text-[2.75rem] leading-[1.1] text-[#f6f1e7]" style={serif}>
+          That page <i className="text-[#d4845a]">isn't here.</i>
+        </h1>
+        <p className="mt-4 max-w-md text-[17px] leading-relaxed text-[#c9c2b5]">
+          The link may be mistyped, or the page has moved. The main site has everything.
+        </p>
+        <Link href="/" className={`${boxSecondary} mt-8`}>
+          go to the main site →
+        </Link>
+      </div>
+    </main>
   );
 }

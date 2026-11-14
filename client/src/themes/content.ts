@@ -7,7 +7,6 @@ export const person = {
   short: "Vishwanth Reddy",
   mark: "VRJ",
   role: "Forward-Deployed Engineer",
-  place: "Charlotte, NC",
   email: "vishwanthreddy2601@gmail.com",
   linkedin: "https://www.linkedin.com/in/jvvr/",
   github: "https://github.com/vishwaj1",
@@ -36,7 +35,7 @@ export const tones = [
   {
     id: "human",
     label: "Human",
-    kicker: "Charlotte",
+    kicker: "In the room",
     line: "I stay in the room",
     rest: "until the software works.",
     body: "Five years of building next to the people who use the thing — pantry staff, lawyers, operators — not from a ticket queue.",

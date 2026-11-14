@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { insertContactSchema } from "@shared/schema";
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub, FaLinkedin, FaTwitter, FaPaperPlane, FaSpinner } from 'react-icons/fa';
+import { FaEnvelope, FaPhone, FaGithub, FaLinkedin, FaTwitter, FaPaperPlane, FaSpinner } from 'react-icons/fa';
 
 export function ContactSection() {
   const { ref, isIntersecting } = useIntersectionObserver();
@@ -58,7 +58,7 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-24 px-6 bg-secondary/20" ref={ref}>
+    <section id="contact" className="py-24 px-6 bg-secondary/20 overflow-x-clip" ref={ref}>
       <div className="container mx-auto max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -107,16 +107,6 @@ export function ContactSection() {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Phone</p>
                   <p className="text-foreground font-medium">+14439922881</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-4 p-4 bg-background rounded-xl border border-border shadow-sm">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <FaMapMarkerAlt size={18} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Location</p>
-                  <p className="text-foreground font-medium">Charlotte, NC</p>
                 </div>
               </div>
             </div>

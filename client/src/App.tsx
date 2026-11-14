@@ -3,11 +3,14 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Home from "@/pages/home";
+import Classic from "@/pages/home";
 import Themes from "@/pages/themes";
 import NotFound from "@/pages/not-found";
-import Walk, { CasePage } from "@/site/walk";
+import Home from "@/site/home";
+import { CasePage } from "@/site/case";
+import Hi from "@/site/hi";
 import { routerBase } from "@/lib/router-base";
+import { ScrollManager } from "@/lib/scroll-manager";
 
 function WorkRoute({ params }: { params?: { slug?: string } }) {
   return <CasePage slug={params?.slug ?? ""} />;
@@ -20,9 +23,11 @@ function AppRoutes() {
       {import.meta.env.DEV && (
         <Route path="/vishwaj1/work/:slug" component={WorkRoute} />
       )}
-      <Route path="/themes" component={Themes} />
-      <Route path="/classic" component={Home} />
-      <Route path="/" component={Walk} />
+      <Route path="/hi/:n" component={Hi} />
+      <Route path="/hi" component={Hi} />
+      {import.meta.env.DEV && <Route path="/themes" component={Themes} />}
+      <Route path="/classic" component={Classic} />
+      <Route path="/" component={Home} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -34,6 +39,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router base={routerBase}>
+          <ScrollManager />
           <AppRoutes />
         </Router>
       </TooltipProvider>

@@ -20,6 +20,26 @@ export default defineConfig({
         }
       },
     },
+    {
+      // /llms.txt: the home page's "agent" view, published for AI tools. One source: client/src/site/agent.md
+      name: "llms-txt",
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && req.url.split("?")[0].endsWith("/llms.txt")) {
+            res.setHeader("Content-Type", "text/plain; charset=utf-8");
+            res.end(fs.readFileSync(path.resolve(import.meta.dirname, "client/src/site/agent.md"), "utf8"));
+            return;
+          }
+          next();
+        });
+      },
+      closeBundle() {
+        const outDir = path.resolve(import.meta.dirname, "dist");
+        if (fs.existsSync(outDir)) {
+          fs.copyFileSync(path.resolve(import.meta.dirname, "client/src/site/agent.md"), path.join(outDir, "llms.txt"));
+        }
+      },
+    },
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
       process.env.REPL_ID !== undefined
