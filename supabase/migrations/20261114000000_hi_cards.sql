@@ -80,5 +80,5 @@ begin
 end;
 $$;
 
-revoke all on function public.register_scan(int, boolean) from public;
+revoke all on function public.register_scan(int, boolean) from public, anon, authenticated;
 grant execute on function public.register_scan(int, boolean) to anon;

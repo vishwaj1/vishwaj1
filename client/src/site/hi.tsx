@@ -193,9 +193,9 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   }
 
   function openCustom() {
+    // The input mounts with autoFocus inside this tap, which is what iOS needs to open the keyboard.
     setCustomOpen(true);
     setTimeout(() => {
-      customRef.current?.focus();
       customRef.current?.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
     }, 60);
   }
@@ -325,6 +325,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                             <input
                               id="hi-custom"
                               ref={customRef}
+                              autoFocus
                               type="text"
                               name="answer"
                               maxLength={140}
