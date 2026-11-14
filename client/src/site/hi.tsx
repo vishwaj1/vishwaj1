@@ -98,7 +98,6 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   useEffect(() => {
     const previous = document.title;
     document.title = cardLabel ? `Card ${cardLabel} · Vishwanth Reddy` : "Hi · Vishwanth Reddy";
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     if (card) track("card_scan", { card: cardLabel });
 
     let cancelled = false;
@@ -351,7 +350,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
               {scan && <CountUp to={scan.count} reduced={reduced} render={(n) => scanCopy(scan, n)} />}
             </p>
           )}
-          <h1 id="card-q" className="mt-4 text-[2.125rem] leading-[1.05] tracking-[-0.01em] text-[#f6f1e7] sm:text-5xl" style={display}>
+          <h1 id="card-q" className="mt-4 text-[2.125rem] leading-[1.12] tracking-[-0.01em] text-[#f6f1e7] sm:text-5xl" style={display}>
             {question.text}
           </h1>
         </motion.section>
@@ -624,9 +623,9 @@ export default function Hi({ params }: { params?: { n?: string } }) {
             <div>
               <dt className={`${label} opacity-60`}>Now</dt>
               <dd className="mt-1 text-[17px] leading-relaxed text-[#c9c2b5]">
-                <span className="block">On the founding engineering team at Lexsy, embedded with lawyers and founders.</span>
+                <span className="block">Founding engineer at Lexsy, building the legal workspace founders and their lawyers use.</span>
                 <span className="mt-3 block opacity-80">
-                  Their work never arrives as a clean spec, so I sit in on incorporations, fundraising and cap tables, then build the system: about twenty tools, three AI agents, and a person who still approves.
+                  Their work never arrives as a clean spec, so I sit in on incorporations, equity, and signing, then build the system: two AI agents, a 106-tool MCP server, and a lawyer who approves every action that matters.
                 </span>
               </dd>
             </div>

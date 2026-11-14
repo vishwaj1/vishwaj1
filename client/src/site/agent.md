@@ -11,14 +11,16 @@ Forward-deployed engineer.
 4. Measure it: if it didn't get faster or simpler, it isn't done
 
 ## Now
-- Founding engineering team, Lexsy.ai (Jul 2025 to present, remote)
-- Internal multi-agent platform: about 20 MCP tools, read and write separated, scoped by role
-- Three internal agents (CTO, COO, Growth). A person still approves before anything ships.
-- LexsyScan reads a client's data room and answers with sources
+- Founding Engineer, AI Platform, Lexsy.ai (Jul 2025 to present, remote)
+- Built most of a legal workspace for startup founders and their lawyers, serving about 50 clients
+- Two role-scoped agents: Ask Lexsy (knows the founder's company, collects missing facts, drafts documents) and a lawyer agent
+- MCP layer: a 106-tool internal server and a 13-tool public server; agents prepare work, only a lawyer can approve, send for signature, or message the client
+- Matter engine (incorporation, hiring, SAFEs, equity grants, NDAs), Word-template drafting with redlines, Dropbox Sign, RAG over client data rooms
+- Principle: models suggest, rules decide, people approve
 
 ## Before
-- UMBC Campus Pantry (2023 to 2025): about 3,000 requests a day, error rate under 1%, API latency from 450 ms to 180 ms
-- Polycom (2022 to 2024): page load down 35%; a BERT classifier cut repetitive manual review by 22%
+- UMBC Campus Pantry (2023 to 2025): about 3,000 requests a day, error rate under 1%, API latency cut 60% (450 ms to 180 ms)
+- Polycom (2021 to 2023): reporting dashboards 35% faster; contributed to a BERT-assisted classification workflow that cut repetitive manual review by 22%
 
 ## Projects
 - Pretty Prompt: rewrites a prompt, scores it, and keeps the history. https://prettyprompt.vercel.app/

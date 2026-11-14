@@ -107,11 +107,8 @@ export default function Home() {
     transition: { duration: 0.25, delay: reduced ? 0 : delay, ease: [0.22, 1, 0.36, 1] as const },
   });
 
-  // All versions are rendered at once (stacked); only the active one is visible.
-  const headlines = [...voices.map((v) => ({ key: v.id as string, line: v.line, rest: v.rest })), { key: "short", ...hookShort }];
-  const activeHead = mode === "short" ? "short" : mode === "expand" ? voices[0].id : voice.id;
-  const bodies = [...voices.map((v) => ({ key: v.id as string, text: v.body as string })), { key: "expand", text: hookExpanded }];
-  const activeBody = mode === "short" ? null : mode === "expand" ? "expand" : voice.id;
+  const headline = mode === "short" ? hookShort : mode === "expand" ? voices[0] : voice;
+  const body = mode === "short" ? null : mode === "expand" ? hookExpanded : voice.body;
 
   return (
     <div style={{ ...sans, color: "#f3efe6" }} className="min-h-[100svh] overflow-x-clip bg-[#0c0b09]">
@@ -174,37 +171,7 @@ export default function Home() {
                 <p className={`${label} mt-1 text-[13px]`}>forward-deployed engineer</p>
               </motion.div>
 
-              {/* Every version of the hook sits in the same grid cell, so the block is always as tall
-                  as the longest one and nothing below it moves when you rewrite. */}
-              <div className="mt-7 grid max-w-3xl">
-                {headlines.map((h) => (
-                  <p
-                    key={h.key}
-                    aria-hidden={h.key !== activeHead}
-                    className={`[grid-area:1/1] text-[clamp(2.75rem,11.5vw,5.4rem)] leading-[0.95] tracking-[-0.01em] text-[#f6f1e7] transition-opacity duration-200 motion-reduce:transition-none sm:text-[clamp(2.75rem,6.6vw,5.4rem)] ${
-                      h.key === activeHead ? "opacity-100" : "pointer-events-none select-none opacity-0"
-                    }`}
-                    style={serif}
-                  >
-                    {h.line} <i className="text-[#d4845a]">{h.rest}</i>
-                  </p>
-                ))}
-              </div>
-              <div className="mt-6 h-px w-14 bg-[#d4845a]" />
-              <div className="mt-5 grid max-w-xl">
-                {bodies.map((b) => (
-                  <p
-                    key={b.key}
-                    aria-hidden={b.key !== activeBody}
-                    className={`[grid-area:1/1] text-[17px] leading-relaxed text-[#c9c2b5] transition-opacity duration-200 motion-reduce:transition-none sm:text-lg ${
-                      b.key === activeBody ? "opacity-100" : "pointer-events-none select-none opacity-0"
-                    }`}
-                  >
-                    {b.text}
-                  </p>
-                ))}
-              </div>
-
+              {/* Toolbar sits above the text, so it never moves however long the text gets. */}
               <div className="mt-6 flex flex-wrap gap-1.5" role="group" aria-label="Rewrite this introduction">
                 <button type="button" onClick={() => setMode("short")} className={mode === "short" ? boxActive : boxSecondary} aria-pressed={mode === "short"}>
                   shorten
@@ -223,6 +190,30 @@ export default function Home() {
                   expand
                 </button>
               </div>
+
+              <motion.p
+                key={`${mode}-${headline.line}`}
+                initial={reduced ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                aria-live="polite"
+                className="mt-6 max-w-3xl text-[clamp(2.75rem,11.5vw,5.4rem)] leading-[1.04] tracking-[-0.01em] text-[#f6f1e7] sm:text-[clamp(2.75rem,6.6vw,5.4rem)]"
+                style={serif}
+              >
+                {headline.line} <i className="text-[#d4845a]">{headline.rest}</i>
+              </motion.p>
+              <div className="mt-6 h-px w-14 bg-[#d4845a]" />
+              {body && (
+                <motion.p
+                  key={mode === "expand" ? "expand" : voice.id}
+                  initial={reduced ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-5 max-w-xl text-[17px] leading-relaxed text-[#c9c2b5] sm:text-lg"
+                >
+                  {body}
+                </motion.p>
+              )}
 
               <div className="mt-7 flex flex-wrap gap-2">
                 <ContactButton kind="linkedin" primary onClick={onLinkedIn} className="w-full whitespace-nowrap sm:w-auto sm:px-6" />

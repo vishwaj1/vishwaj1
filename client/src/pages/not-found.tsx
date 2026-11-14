@@ -9,7 +9,7 @@ export default function NotFound() {
     >
       <div className="mx-auto w-full max-w-[640px]">
         <p className={label}>404</p>
-        <h1 className="mt-3 text-[2.75rem] leading-[1] text-[#f6f1e7]" style={serif}>
+        <h1 className="mt-3 text-[2.75rem] leading-[1.1] text-[#f6f1e7]" style={serif}>
           That page <i className="text-[#d4845a]">isn't here.</i>
         </h1>
         <p className="mt-4 max-w-md text-[17px] leading-relaxed text-[#c9c2b5]">

@@ -14,64 +14,35 @@ export const person = {
   resume: `${import.meta.env.BASE_URL}VishwanthReddyJakka_SoftwareEngineer.pdf`,
 };
 
-export const chapters = [
-  { id: "open", label: "Open" },
-  { id: "lexsy", label: "Lexsy" },
-  { id: "umbc", label: "UMBC" },
-  { id: "polycom", label: "Polycom" },
-  { id: "work", label: "Open work" },
-] as const;
-
-export type ChapterId = (typeof chapters)[number]["id"];
-
-export const lexsyBeats = [
-  {
-    kicker: "The room",
-    title: "Lawyers, operators, founders.",
-    body: "Incorporation, fundraising, equity, hiring, cap tables, signatures. None of it arrived as a clean spec.",
-  },
-  {
-    kicker: "The workflows",
-    title: "I stayed until it had a shape.",
-    body: "The same people who run the work helped decide what the first version actually was.",
-  },
-  {
-    kicker: "The tools",
-    title: "About twenty tools.",
-    body: "Read and write are split. CTO, COO, and Growth each get their own room. LexsyScan reads the data room and shows its sources.",
-  },
-  {
-    kicker: "The gate",
-    title: "A person still approves.",
-    body: "Then it ships. Cost, audit, and tenant lines sit in the system, not in a follow-up doc.",
-  },
-] as const;
-
 export const cases = {
   lexsy: {
     title: "Lexsy",
     when: "Jul 2025 — present · Remote",
-    role: "Founding engineering team",
+    role: "Founding engineer, AI platform",
     sections: [
       {
         heading: "The room",
-        body: "I was embedded with lawyers, legal operators, and founders. The work in front of us was incorporation, fundraising, equity, hiring, cap tables, and e-signature. It was a set of real workflows, not a ticket with an answer already written.",
+        body: "Lexsy is a legal workspace where startup founders and their lawyers run every matter: incorporation, hiring, SAFEs, equity grants, cofounder stock, NDAs, and offboarding. I joined as the founding engineer and built most of the product before the team grew.",
       },
       {
         heading: "What shipped",
-        body: "An internal multi-agent platform on Claude Managed Agents and OpenClaw, with Model Context Protocol. About twenty tools, read and write separated, scoped by role, with tenant isolation, approval gates, and structured outputs. Three agents sit behind that: CTO, COO, and Growth. LexsyScan classifies a client data room and answers from it, with sources. Model routing, token telemetry, rate limits, and cost-aware fallbacks keep the spend visible.",
+        body: "A founder portal to run the company and a lawyer portal to run the whole practice, on one shared company record now serving about 50 clients. Two role-scoped agents: Ask Lexsy, which knows the founder's company, collects missing facts in conversation, and drafts documents; and a lawyer agent that works across every company that lawyer is assigned.",
+      },
+      {
+        heading: "The gate",
+        body: "Behind both agents, a 106-tool internal MCP server and a 13-tool public server unlock actions by role. Agents prepare the work, but only a lawyer can approve, send for signature, or message the client. Models suggest, rules decide, people approve.",
       },
       {
         heading: "What is running",
-        body: "The platform is in production for a multi-tenant legal product. RBAC, audit logs, and a human review gate are part of how it supports SOC 2. The number I stand behind on the main page is the tool surface: about twenty tools, each with a job.",
+        body: "Incorporation runs end to end, from state and trademark name checks to the charter, 83(b), option plan, and SS-4. Drafting runs on Word templates with redlines, so lawyers review a diff instead of a full reread. When the last signature lands in Dropbox Sign, the file is filed to the data room and the cap table updates itself. RAG over client data rooms reaches founders only after a lawyer publishes the findings.",
       },
     ],
-    stack: "React · TypeScript · Supabase / PostgreSQL · Deno Edge Functions · MCP",
+    stack: "React · TypeScript · Node.js · NestJS · PostgreSQL / Supabase · MCP · RAG · Dropbox Sign · Stripe",
   },
   umbc: {
     title: "UMBC",
     when: "Aug 2023 — May 2025 · Baltimore",
-    role: "Graduate software engineer, UMBC",
+    role: "Software engineer, campus systems",
     sections: [
       {
         heading: "The room",
@@ -90,20 +61,20 @@ export const cases = {
   },
   polycom: {
     title: "Polycom",
-    when: "Apr 2022 — May 2024 · India",
+    when: "Apr 2021 — May 2023 · India",
     role: "Software engineer",
     sections: [
       {
         heading: "The room",
-        body: "Scheduling, reporting, and structured records. Internal tools for people who already had a way of working and needed it to stop fighting them.",
+        body: "Enterprise scheduling, reporting, and workflow systems. Internal tools for people who already had a way of working and needed it to stop fighting them.",
       },
       {
         heading: "What shipped",
-        body: "Features across the interface, the APIs, authentication, the data model, and the deploy. Secure REST services with RBAC, input validation, and audit-friendly requests. A BERT classifier that recommended structured codes.",
+        body: "REST services, data models, and interfaces for scheduling, reporting, and workflow features, with RBAC. I also contributed to a BERT-assisted document classification workflow that suggested categories to reviewers.",
       },
       {
         heading: "What is running",
-        body: "Page load dropped by 35%. The classifier cut repetitive manual review by 22%.",
+        body: "Reporting dashboards got 35% faster through query and data-flow work. The classification workflow cut repetitive manual review by 22%.",
       },
     ],
     stack: "React · TypeScript · Node.js · REST · Docker",
@@ -159,7 +130,7 @@ export const voices = [
 export const hookShort = { line: "I listen.", rest: "Then I ship." } as const;
 
 export const hookExpanded =
-  "At Lexsy, I sat with lawyers and founders and built the agent platform they use. At UMBC, the pantry staff knew the constraints; it now handles 3,000 requests a day. At Polycom, pages got 35% faster. Listen first, ship second.";
+  "At Lexsy, I built most of the legal workspace founders and their lawyers use, now serving about 50 clients. At UMBC, the pantry staff knew the constraints; it now handles 3,000 requests a day. At Polycom, reporting got 35% faster. Listen first, ship second.";
 
 /** How I work: the method, with where each step showed up. */
 export const method = [
@@ -191,10 +162,10 @@ export const results = [
     slug: "lexsy",
     org: "lexsy.ai",
     when: "2025 — now",
-    stat: "20",
-    unit: "MCP tools in production",
-    line: "A multi-agent platform with CTO, COO, and Growth agents. LexsyScan reads a client's data room and answers with sources.",
-    note: "none of it arrived as a clean spec",
+    stat: "106",
+    unit: "MCP tools behind two agents",
+    line: "Most of a legal workspace for founders and their lawyers, serving about 50 clients. Agents prepare the work; only a lawyer can approve, sign, or message the client.",
+    note: "models suggest, rules decide, people approve",
   },
   {
     slug: "umbc",
@@ -208,10 +179,10 @@ export const results = [
   {
     slug: "polycom",
     org: "polycom",
-    when: "2022 — 2024",
+    when: "2021 — 2023",
     stat: "35%",
-    unit: "faster pages",
-    line: "Scheduling, reporting, and structured records. A BERT classifier cut repetitive manual review by 22%.",
+    unit: "faster reporting dashboards",
+    line: "Scheduling, reporting, and workflow systems with RBAC. A BERT-assisted classification workflow cut repetitive manual review by 22%.",
     note: "the pages got out of the way",
   },
 ] as const;

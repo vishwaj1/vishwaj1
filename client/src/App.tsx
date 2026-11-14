@@ -10,6 +10,7 @@ import Home from "@/site/home";
 import { CasePage } from "@/site/case";
 import Hi from "@/site/hi";
 import { routerBase } from "@/lib/router-base";
+import { ScrollManager } from "@/lib/scroll-manager";
 
 function WorkRoute({ params }: { params?: { slug?: string } }) {
   return <CasePage slug={params?.slug ?? ""} />;
@@ -38,6 +39,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router base={routerBase}>
+          <ScrollManager />
           <AppRoutes />
         </Router>
       </TooltipProvider>
