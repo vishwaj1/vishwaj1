@@ -23,7 +23,7 @@ function DetailsLink({ slug, label }: { slug: string; label: string }) {
   return (
     <Link
       href={`/work/${slug}`}
-      className="mt-8 inline-block text-sm uppercase tracking-[0.16em] text-[#e2a15a] hover:underline"
+      className="mt-8 inline-flex min-h-[44px] items-center text-sm uppercase tracking-[0.16em] underline underline-offset-4 opacity-80 hover:opacity-100"
     >
       Stay with {label}
     </Link>
@@ -117,7 +117,7 @@ export default function Walk() {
             key={chapter.id}
             href={chapterHref(chapter.id)}
             aria-current={active === chapter.id ? "page" : undefined}
-            className={`rounded-sm px-1 py-1 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a] ${
+            className={`rounded-sm px-1 py-3.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a] ${
               active === chapter.id ? "text-[#e2a15a]" : "opacity-70 hover:opacity-100"
             }`}
             onClick={(event) => {
@@ -131,12 +131,20 @@ export default function Walk() {
         ))}
       </nav>
 
-      <div className="fixed right-4 top-4 z-40 flex items-center gap-3 text-[12px] uppercase tracking-[0.16em]" style={sans}>
-        <a className="opacity-80 hover:opacity-100" href={person.resume} target="_blank" rel="noreferrer">
+      <div
+        className="fixed inset-x-0 top-0 z-40 flex items-center justify-end gap-2 bg-[#13110f]/90 px-4 py-2 text-[12px] uppercase tracking-[0.16em] backdrop-blur md:inset-x-auto md:right-4 md:top-4 md:rounded-sm md:py-1.5"
+        style={sans}
+      >
+        <a className="flex min-h-[44px] items-center px-2 opacity-80 hover:opacity-100" href={person.resume} target="_blank" rel="noreferrer">
           Resume
         </a>
-        <a className="bg-[#e2a15a] px-3 py-2 text-[#1c1917] hover:bg-[#efb56e]" href={person.calendly} target="_blank" rel="noreferrer">
-          Book a call
+        <a
+          className="flex min-h-[44px] items-center bg-[#e2a15a] px-4 text-[#1c1917] hover:bg-[#efb56e]"
+          href={person.linkedin}
+          target="_blank"
+          rel="noreferrer"
+        >
+          LinkedIn
         </a>
       </div>
 
@@ -167,27 +175,31 @@ function OpenScene({ reduced }: { reduced: boolean }) {
             <br />
             Reddy Jakka
           </motion.h1>
+          <p className="mt-6 text-sm uppercase tracking-[0.18em] opacity-70">{person.role}</p>
           <motion.p
             initial={reduced ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35, duration: 0.8 }}
-            className="mt-8 max-w-xl text-2xl leading-snug sm:text-3xl"
+            className="mt-4 max-w-xl text-2xl leading-snug sm:text-3xl"
             style={display}
           >
             {person.line}
           </motion.p>
-          <p className="mt-5 text-sm uppercase tracking-[0.18em] opacity-70">{person.role}</p>
         </div>
         <motion.img
           src={person.photo}
           alt={person.name}
+          width={800}
+          height={1000}
+          fetchPriority="high"
+          decoding="async"
           initial={reduced ? false : { opacity: 0, filter: "blur(16px)" }}
           animate={{ opacity: 1, filter: "blur(0px)" }}
           transition={{ duration: 1.1, delay: 0.15 }}
           className="aspect-[4/5] w-full max-w-[220px] object-cover object-[center_18%] sm:max-w-xs lg:aspect-[3/4] lg:max-w-sm lg:justify-self-end"
         />
       </div>
-      <p className="mt-12 text-[11px] uppercase tracking-[0.22em] text-[#e2a15a]">Scroll the room</p>
+      <p className="mt-12 text-[11px] uppercase tracking-[0.22em] opacity-60">Scroll the room</p>
     </section>
   );
 }
@@ -211,11 +223,11 @@ function LexsyScene({ reduced }: { reduced: boolean }) {
   if (reduced) {
     return (
       <section id="lexsy" className="scroll-mt-6 py-20">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-[#e2a15a]">Lexsy · founding team</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] opacity-60">Lexsy · founding team</p>
         <div className="mt-8 space-y-10">
           {lexsyBeats.map((item) => (
             <article key={item.kicker} className="border-t border-[#e2a15a] pt-4">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[#e2a15a]">{item.kicker}</p>
+              <p className="text-[11px] uppercase tracking-[0.16em] opacity-60">{item.kicker}</p>
               <h2 className="mt-3 text-4xl leading-[0.95]" style={display}>
                 {item.title}
               </h2>
@@ -231,7 +243,7 @@ function LexsyScene({ reduced }: { reduced: boolean }) {
   return (
     <section id="lexsy" ref={ref} className="h-[320vh] scroll-mt-6">
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center py-16">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-[#e2a15a]">Lexsy · founding team</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] opacity-60">Lexsy · founding team</p>
         <div className="mt-6 grid items-end gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <AnimatePresence mode="wait">
@@ -255,7 +267,7 @@ function LexsyScene({ reduced }: { reduced: boolean }) {
               const on = index <= beat;
               return (
                 <li key={item.kicker} className={`border-t pt-3 transition ${on ? "border-[#e2a15a]" : "border-current/25"}`}>
-                  <span className="text-[11px] uppercase tracking-[0.16em] text-[#e2a15a]">{item.kicker}</span>
+                  <span className="text-[11px] uppercase tracking-[0.16em] opacity-60">{item.kicker}</span>
                   <p className="mt-3 text-sm leading-relaxed">{item.title}</p>
                 </li>
               );
@@ -290,7 +302,7 @@ function PantryScene({ reduced }: { reduced: boolean }) {
   }, [inView, reduced]);
 
   return (
-    <section id="umbc" ref={ref} className="flex min-h-[100svh] scroll-mt-6 flex-col justify-center py-24">
+    <section id="umbc" ref={ref} className="flex min-h-[70svh] scroll-mt-6 flex-col justify-center py-20 md:min-h-[100svh] md:py-24">
       <p className="text-[11px] uppercase tracking-[0.22em] opacity-60">UMBC · Campus Pantry</p>
       <p className="mt-4 max-w-xl text-3xl leading-snug sm:text-4xl" style={display}>
         The staff already knew the constraints. I built the line around them.
@@ -303,7 +315,7 @@ function PantryScene({ reduced }: { reduced: boolean }) {
           <span className="mt-2 block text-sm uppercase tracking-[0.16em] opacity-70">requests a day</span>
         </p>
         <p>
-          <span className="block text-7xl leading-none text-[#e2a15a] sm:text-8xl" style={display}>
+          <span className="block text-7xl leading-none sm:text-8xl" style={display}>
             {latency}
             <span className="ml-2 text-2xl">ms</span>
           </span>
@@ -321,7 +333,7 @@ function PolycomScene({ reduced }: { reduced: boolean }) {
   const play = inView || reduced;
 
   return (
-    <section id="polycom" ref={ref} className="flex min-h-[90svh] scroll-mt-6 flex-col justify-center py-24">
+    <section id="polycom" ref={ref} className="flex min-h-[60svh] scroll-mt-6 flex-col justify-center py-20 md:min-h-[90svh] md:py-24">
       <p className="text-[11px] uppercase tracking-[0.22em] opacity-60">Polycom · India</p>
       <div className="mt-8 grid items-center gap-10 lg:grid-cols-2">
         <div>
@@ -337,7 +349,7 @@ function PolycomScene({ reduced }: { reduced: boolean }) {
           {[100, 78, 46].map((width, index) => (
             <motion.div
               key={width}
-              className="h-3 bg-current/80"
+              className="h-3 bg-[#f3eee6]/80"
               initial={false}
               animate={{ width: play ? `${width * 0.65}%` : "100%", opacity: play ? 1 - index * 0.2 : 0.35 }}
               transition={{ duration: reduced ? 0 : 0.9, delay: index * 0.08 }}
@@ -352,6 +364,41 @@ function PolycomScene({ reduced }: { reduced: boolean }) {
   );
 }
 
+function Closing({ education = false }: { education?: boolean }) {
+  const link =
+    "inline-flex min-h-[44px] items-center text-sm uppercase tracking-[0.16em] underline underline-offset-4 opacity-80 hover:opacity-100";
+  return (
+    <div className="mt-20 max-w-xl">
+      <p className="text-3xl leading-snug" style={display}>
+        Building something hard? I'd like to hear about it.
+      </p>
+      <a
+        href={person.linkedin}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-6 flex min-h-[52px] w-full max-w-sm items-center justify-center bg-[#e2a15a] px-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#1c1917] hover:bg-[#efb56e]"
+      >
+        Connect on LinkedIn
+      </a>
+      <div className="mt-4 flex flex-wrap gap-x-6">
+        <a className={link} href={person.calendly} target="_blank" rel="noreferrer">
+          Book a call
+        </a>
+        <a className={link} href={person.resume} target="_blank" rel="noreferrer">
+          Resume
+        </a>
+        <a className={link} href={`mailto:${person.email}`}>
+          Email
+        </a>
+        <a className={link} href={person.github} target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+      </div>
+      {education && <p className="mt-6 text-sm opacity-60">MS in Computer Science, UMBC, 2025. BE from Vasavi, 2023.</p>}
+    </div>
+  );
+}
+
 function WorkScene() {
   return (
     <section id="work" className="scroll-mt-6 pb-20 pt-16">
@@ -359,11 +406,17 @@ function WorkScene() {
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {doors.map((door) => (
           <a key={door.name} href={door.href} target="_blank" rel="noreferrer" className="group block">
-            <span className="block overflow-hidden">
+            <span className="block aspect-[16/10] overflow-hidden bg-[#1c1917]">
               <img
                 src={door.image}
-                alt=""
-                className="h-64 w-full object-cover transition duration-700 group-hover:scale-[1.03] sm:h-80"
+                alt={`${door.name} screenshot`}
+                width={1400}
+                height={875}
+                loading="lazy"
+                decoding="async"
+                className={`h-full w-full transition duration-700 group-hover:scale-[1.03] ${
+                  door.fit === "contain" ? "object-contain p-6" : "object-cover object-top"
+                }`}
               />
             </span>
             <span className="mt-4 block text-4xl" style={display}>
@@ -374,18 +427,7 @@ function WorkScene() {
         ))}
       </div>
 
-      <div className="mt-24 max-w-xl">
-        <p className="text-3xl leading-snug" style={display}>
-          MS in Computer Science, UMBC, 2025. BE from Vasavi, 2023.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm uppercase tracking-[0.16em]">
-          <a className="hover:text-[#e2a15a]" href={person.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
-          <a className="hover:text-[#e2a15a]" href={person.github} target="_blank" rel="noreferrer">GitHub</a>
-          <a className="hover:text-[#e2a15a]" href={`mailto:${person.email}`}>Email</a>
-          <a className="hover:text-[#e2a15a]" href={person.calendly} target="_blank" rel="noreferrer">Book a call</a>
-          <a className="hover:text-[#e2a15a]" href={person.resume} target="_blank" rel="noreferrer">Resume</a>
-        </div>
-      </div>
+      <Closing education />
     </section>
   );
 }
@@ -403,7 +445,7 @@ export function CasePage({ slug }: { slug: string }) {
     return (
       <main className="min-h-screen bg-[#13110f] px-6 py-16 text-[#f3eee6]" style={sans}>
         <p>That page is not on this walk.</p>
-        <a href={homePath} className="mt-4 inline-block text-[#e2a15a]">
+        <a href={homePath} className="mt-4 inline-block underline underline-offset-4">
           Back
         </a>
       </main>
@@ -413,7 +455,7 @@ export function CasePage({ slug }: { slug: string }) {
   return (
     <main className="min-h-screen bg-[#13110f] px-6 py-16 text-[#f3eee6] md:px-10" style={sans}>
       <div className="mx-auto max-w-2xl">
-        <a href={chapterHref(key)} className="text-[12px] uppercase tracking-[0.18em] text-[#e2a15a]">
+        <a href={chapterHref(key)} className="inline-flex min-h-[44px] items-center text-[12px] uppercase tracking-[0.18em] underline underline-offset-4 opacity-80 hover:opacity-100">
           Back to the walk
         </a>
         <p className="mt-10 text-[12px] uppercase tracking-[0.18em] opacity-60">{story.role}</p>
@@ -432,6 +474,7 @@ export function CasePage({ slug }: { slug: string }) {
           ))}
         </div>
         <p className="mt-14 text-sm uppercase tracking-[0.14em] opacity-60">{story.stack}</p>
+        <Closing />
       </div>
     </main>
   );

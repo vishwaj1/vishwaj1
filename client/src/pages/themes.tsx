@@ -1,9 +1,25 @@
-import { useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { PromptTheme } from "@/themes/prompt-theme";
 import { SignalTheme } from "@/themes/signal-theme";
 import { ThreadTheme } from "@/themes/thread-theme";
 import { themeMeta, type ThemeId } from "@/themes/content";
+
+const themeFonts =
+  "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,620;1,9..144,500&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@360;500;640&family=Syne:wght@600;700;800&display=swap";
+
+/** These fonts are only needed on /themes, so they are not in index.html. */
+function useThemeFonts() {
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = themeFonts;
+    document.head.appendChild(link);
+    return () => {
+      link.remove();
+    };
+  }, []);
+}
 
 const views: Record<ThemeId, () => ReactElement> = {
   prompt: PromptTheme,
@@ -40,6 +56,7 @@ function themeFromUrl(): ThemeId {
 }
 
 export default function ThemesPage() {
+  useThemeFonts();
   const [theme, setTheme] = useState<ThemeId>(themeFromUrl);
   const skin = chrome[theme];
   const meta = themeMeta.find((item) => item.id === theme)!;

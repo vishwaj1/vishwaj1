@@ -23,7 +23,7 @@ function AppRoutes() {
       )}
       <Route path="/hi/:n" component={Hi} />
       <Route path="/hi" component={Hi} />
-      <Route path="/themes" component={Themes} />
+      {import.meta.env.DEV && <Route path="/themes" component={Themes} />}
       <Route path="/classic" component={Home} />
       <Route path="/" component={Walk} />
       <Route component={NotFound} />

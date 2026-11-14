@@ -1,5 +1,5 @@
-import profile from "@/assets/profile.jpeg";
-import prettyPrompt from "@/assets/projects/pretty-prompt.png";
+import profile from "@/assets/profile-hero.jpg";
+import prettyPrompt from "@/assets/projects/pretty-prompt.jpg";
 import webTalk from "@/assets/projects/web-talk.png";
 
 export const person = {
@@ -118,11 +118,13 @@ export const doors = [
     line: "A workspace that rewrites a prompt, scores it, and keeps the history.",
     href: "https://prettyprompt.vercel.app/",
     image: prettyPrompt,
+    fit: "cover",
   },
   {
     name: "Web Talk",
     line: "Say what you want. The browser does the next thing.",
     href: "https://github.com/vishwaj1/Web-Talk",
     image: webTalk,
+    fit: "contain",
   },
 ];
