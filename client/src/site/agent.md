@@ -1,6 +1,14 @@
 # Vishwanth Reddy Jakka
 
-Forward-deployed engineer. I sit with the people doing the work, then ship the system.
+Forward-deployed engineer.
+
+> I sit with the people doing the work. Then I ship the system.
+
+## How I work
+1. Sit with the people doing the work, before anything is written down
+2. Map the real workflow: what actually happens, who signs off, where it breaks
+3. Ship to production, with a person approving where it matters
+4. Measure it: if it didn't get faster or simpler, it isn't done
 
 ## Now
 - Founding engineering team, Lexsy.ai (Jul 2025 to present, remote)
@@ -20,8 +28,8 @@ Forward-deployed engineer. I sit with the people doing the work, then ship the s
 - MS in Computer Science, UMBC, 2025
 - BE, Vasavi, 2023
 
-## Looking for
-Forward-deployed or product engineering roles, on a team where engineers sit close to the people using what they build.
+## Best fit
+Forward-deployed or product engineering, where engineers work next to the people they build for.
 
 ## Contact
 - LinkedIn: https://www.linkedin.com/in/jvvr/

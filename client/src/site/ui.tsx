@@ -97,7 +97,7 @@ export function Closing({
   return (
     <section id="contact" className="scroll-mt-20 border-t border-[#2a2622] pt-10">
       <p className="text-[2.25rem] leading-[1.05] text-[#f3efe6] sm:text-5xl" style={serif}>
-        Building something hard? <i className="text-[#d4845a]">I'd like to hear about it.</i>
+        Working on something hard <i className="text-[#d4845a]">with real users? Let's talk.</i>
       </p>
       <ContactButton kind="linkedin" primary onClick={onLinkedIn} className="mt-7 w-full sm:w-auto sm:px-6" />
       <div className="mt-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">

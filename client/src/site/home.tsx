@@ -2,16 +2,13 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link } from "wouter";
 import { Copy } from "lucide-react";
-import { proofs, tones } from "@/themes/content";
-import { doors, person } from "./copy";
+import { doors, hookExpanded, hookShort, method, person, results, voices } from "./copy";
 import agentMarkdown from "./agent.md?raw";
 import { track } from "./hi-data";
 import { boxActive, boxSecondary, Closing, ContactButton, label, mono, sans, serif } from "./ui";
 
 type View = "human" | "agent";
 type Mode = "short" | "voice" | "expand";
-
-const status = "currently · founding engineering at lexsy";
 
 function readView(): View {
   try {
@@ -21,29 +18,43 @@ function readView(): View {
   }
 }
 
-/** Two-way switch, like a radio group. Keeps ?view=agent in the URL so the agent view can be shared. */
+/** A field note: the kind of line you scribble while sitting with a team. */
+function FieldNote({ children, className = "" }: { children: string; className?: string }) {
+  return (
+    <p
+      className={`border-l border-[#d4845a]/60 pl-3 text-[1.2rem] italic leading-snug text-[#d4845a] ${className}`}
+      style={serif}
+    >
+      “{children}”
+    </p>
+  );
+}
+
+/** Two-way switch. Keeps ?view=agent in the URL so the AI version can be shared. */
 function ViewSwitch({ view, onChange }: { view: View; onChange: (v: View) => void }) {
-  const option = (v: View) => (
+  const option = (v: View, text: string) => (
     <button
       type="button"
       role="radio"
       aria-checked={view === v}
       onClick={() => onChange(v)}
-      className={`${mono} flex min-h-[40px] items-center gap-1.5 px-3 text-[12px] lowercase focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d4845a] ${
+      className={`${mono} flex min-h-[40px] items-center gap-1.5 whitespace-nowrap px-2.5 text-[12px] lowercase focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d4845a] ${
         view === v ? "bg-[#1f1c18] text-[#f3efe6]" : "text-[#8a847a] hover:text-[#c9c2b5]"
       }`}
     >
       <span aria-hidden>{view === v ? "●" : "○"}</span>
-      {v}
+      {text}
     </button>
   );
   return (
-    <div role="radiogroup" aria-label="View this page as" className="flex border border-[#3a352f]">
-      {option("human")}
-      {option("agent")}
+    <div role="radiogroup" aria-label="Read this page" className="flex border border-[#3a352f]">
+      {option("human", "for people")}
+      {option("agent", "for your ai")}
     </div>
   );
 }
+
+const navLink = `${mono} inline-flex min-h-[44px] items-center px-2 text-[13px] lowercase text-[#c9c2b5] hover:text-[#f3efe6] hover:underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d4845a]`;
 
 export default function Home() {
   const reduced = useReducedMotion() ?? false;
@@ -51,10 +62,10 @@ export default function Home() {
   const [tone, setTone] = useState(0);
   const [mode, setMode] = useState<Mode>("voice");
   const [copied, setCopied] = useState(false);
-  const voice = tones[tone];
+  const voice = voices[tone];
 
   useEffect(() => {
-    document.title = "Vishwanth Reddy";
+    document.title = "Vishwanth Reddy Jakka · Forward-deployed engineer";
   }, []);
 
   function changeView(next: View) {
@@ -82,9 +93,10 @@ export default function Home() {
     }
   }
 
+  /** First tap from shorten/expand returns to the current voice; taps after that cycle voices. */
   function retone() {
+    if (mode === "voice") setTone((n) => (n + 1) % voices.length);
     setMode("voice");
-    setTone((n) => (n + 1) % tones.length);
   }
 
   const onLinkedIn = () => track("linkedin_clicked", { page: "home" });
@@ -95,21 +107,29 @@ export default function Home() {
     transition: { duration: 0.25, delay: reduced ? 0 : delay, ease: [0.22, 1, 0.36, 1] as const },
   });
 
+  const headline = mode === "short" ? hookShort : mode === "expand" ? voices[0] : voice;
+  const body = mode === "short" ? null : mode === "expand" ? hookExpanded : voice.body;
+
   return (
     <div style={{ ...sans, color: "#f3efe6" }} className="min-h-[100svh] overflow-x-clip bg-[#0c0b09]">
-      {/* Top bar */}
+      {/* Top bar: name, sections as plain text, then the switch and the two actions */}
       <header className="sticky top-0 z-40 border-b border-[#2a2622] bg-[#0c0b09]/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-[max(1rem,env(safe-area-inset-left))] py-2 sm:px-8">
-          <div className="flex items-center gap-1.5">
-            <a href="#top" className={`${boxSecondary} whitespace-nowrap px-3`} aria-label="Vishwanth Reddy, back to top">
+          <div className="flex items-center gap-2">
+            <a
+              href="#top"
+              className={`${mono} inline-flex min-h-[44px] items-center whitespace-nowrap text-[14px] lowercase text-[#f3efe6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d4845a]`}
+              aria-label="Vishwanth Reddy, back to top"
+            >
               <span>
                 vishwanth<span className="hidden sm:inline"> reddy</span>
               </span>
             </a>
-            <nav className="hidden items-center gap-1.5 lg:flex" aria-label="Sections">
-              <a href="#proof" className={`${boxSecondary} px-3`}>proof</a>
-              <a href="#projects" className={`${boxSecondary} px-3`}>projects</a>
-              <a href="#contact" className={`${boxSecondary} px-3`}>contact</a>
+            <nav className="ml-4 hidden items-center lg:flex" aria-label="Sections">
+              <a href="#method" className={navLink}>how i work</a>
+              <a href="#proof" className={navLink}>proof</a>
+              <a href="#projects" className={navLink}>projects</a>
+              <a href="#contact" className={navLink}>contact</a>
             </nav>
           </div>
           <div className="flex items-center gap-1.5">
@@ -123,9 +143,7 @@ export default function Home() {
       {view === "agent" ? (
         <main className="mx-auto max-w-3xl px-[max(1rem,env(safe-area-inset-left))] pb-[max(3rem,env(safe-area-inset-bottom))] pt-8 sm:px-8">
           <p className={label}>~/vishwanth · this page, written for an ai to read</p>
-          <pre
-            className={`${mono} mt-5 whitespace-pre-wrap break-words text-[14px] leading-[1.7] text-[#d9d3c7] sm:text-[15px]`}
-          >
+          <pre className={`${mono} mt-5 whitespace-pre-wrap break-words text-[14px] leading-[1.7] text-[#d9d3c7] sm:text-[15px]`}>
             {agentMarkdown}
           </pre>
           <div className="mt-8 flex flex-wrap gap-2">
@@ -143,7 +161,7 @@ export default function Home() {
         </main>
       ) : (
         <main id="top" className="mx-auto max-w-6xl px-[max(1.125rem,env(safe-area-inset-left))] pb-[max(3rem,env(safe-area-inset-bottom))] sm:px-8">
-          {/* Hero */}
+          {/* Hero: name first, then the hook you can rewrite */}
           <section className="grid gap-8 pb-14 pt-8 sm:grid-cols-[1.5fr_1fr] sm:items-center sm:gap-10 sm:pt-12 lg:grid-cols-[1.4fr_0.8fr] lg:gap-14 lg:pb-20 lg:pt-16">
             <div>
               <motion.div {...fade(0)}>
@@ -152,33 +170,23 @@ export default function Home() {
                 </h1>
                 <p className={`${label} mt-1 text-[13px]`}>forward-deployed engineer</p>
               </motion.div>
-              <motion.p {...fade(0)} className={`${mono} mt-5 inline-block border border-[#3a352f] px-2.5 py-1.5 text-[12px] lowercase text-[#c9c2b5]`}>
-                {status}
-              </motion.p>
+
               <AnimatePresence mode="wait" initial={false}>
                 <motion.p
-                  key={`${mode}-${voice.id}`}
+                  key={`${mode}-${headline.line}`}
                   initial={reduced ? false : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={reduced ? undefined : { opacity: 0, y: -6 }}
                   transition={{ duration: 0.2 }}
-                  className="mt-5 max-w-3xl text-[clamp(2.75rem,11.5vw,5.4rem)] leading-[0.95] sm:text-[clamp(2.75rem,6.6vw,5.4rem)] tracking-[-0.01em] text-[#f6f1e7]"
+                  className="mt-7 max-w-3xl text-[clamp(2.75rem,11.5vw,5.4rem)] leading-[0.95] tracking-[-0.01em] text-[#f6f1e7] sm:text-[clamp(2.75rem,6.6vw,5.4rem)]"
                   style={serif}
                 >
-                  {mode === "short" ? (
-                    <>
-                      I ship the <i className="text-[#d4845a]">system.</i>
-                    </>
-                  ) : (
-                    <>
-                      {voice.line} <i className="text-[#d4845a]">{voice.rest}</i>
-                    </>
-                  )}
+                  {headline.line} <i className="text-[#d4845a]">{headline.rest}</i>
                 </motion.p>
               </AnimatePresence>
               <div className="mt-6 h-px w-14 bg-[#d4845a]" />
               <AnimatePresence mode="wait" initial={false}>
-                {mode !== "short" && (
+                {body && (
                   <motion.p
                     key={mode === "expand" ? "expand" : voice.id}
                     initial={reduced ? false : { opacity: 0 }}
@@ -187,9 +195,7 @@ export default function Home() {
                     transition={{ duration: 0.2 }}
                     className="mt-5 max-w-xl text-[17px] leading-relaxed text-[#c9c2b5] sm:text-lg"
                   >
-                    {mode === "expand"
-                      ? "Lexsy is the long version. Pantry and Polycom are the proof that this was true before the title."
-                      : voice.body}
+                    {body}
                   </motion.p>
                 )}
               </AnimatePresence>
@@ -199,7 +205,7 @@ export default function Home() {
                   shorten
                 </button>
                 <button type="button" onClick={retone} className={mode === "voice" ? boxActive : boxSecondary} aria-pressed={mode === "voice"}>
-                  retone · {voice.label.toLowerCase()}
+                  retone · {voice.label}
                 </button>
                 <button type="button" onClick={() => setMode("expand")} className={mode === "expand" ? boxActive : boxSecondary} aria-pressed={mode === "expand"}>
                   expand
@@ -223,36 +229,59 @@ export default function Home() {
               />
               <figcaption className={`${label} mt-2 flex justify-between`}>
                 <span>vishwanth reddy</span>
-                <span>portrait</span>
+                <span>field portrait</span>
               </figcaption>
             </motion.figure>
           </section>
 
-          {/* Proof */}
-          <section id="proof" className="scroll-mt-20 border-t border-[#2a2622] pt-8" aria-labelledby="proof-h">
+          {/* How I work: the method is the signature */}
+          <section id="method" className="scroll-mt-20 border-t border-[#2a2622] pt-8" aria-labelledby="method-h">
+            <h2 id="method-h" className={label}>
+              how i work
+            </h2>
+            <ol className="mt-5 grid gap-x-10 gap-y-8 md:grid-cols-2">
+              {method.map((item, index) => (
+                <li key={item.step}>
+                  <p className={`${mono} text-[13px] lowercase text-[#d4845a]`}>0{index + 1}</p>
+                  <h3 className="mt-1 text-[1.9rem] leading-tight text-[#f6f1e7]" style={serif}>
+                    {item.step}
+                  </h3>
+                  <p className="mt-2 max-w-md text-[16px] leading-relaxed text-[#c9c2b5]">{item.body}</p>
+                  <p className={`${label} mt-2`}>seen at {item.seen}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-10 max-w-xl text-[1.5rem] leading-[1.2] text-[#f6f1e7]" style={serif}>
+              I'm most useful where engineers work <i className="text-[#d4845a]">next to the people they build for.</i>
+            </p>
+          </section>
+
+          {/* Proof: one result per place, each with a field note and its full story */}
+          <section id="proof" className="mt-14 scroll-mt-20 border-t border-[#2a2622] pt-8" aria-labelledby="proof-h">
             <h2 id="proof-h" className={label}>
               proof
             </h2>
             <div className="mt-4 grid gap-px bg-[#2a2622] md:grid-cols-3">
-              {proofs.map((proof, index) => (
-                <article key={proof.org} className="bg-[#0c0b09] py-6 md:px-6 md:first:pl-0">
+              {results.map((result, index) => (
+                <article key={result.slug} className="flex flex-col bg-[#0c0b09] py-6 md:px-6 md:first:pl-0 md:last:pr-0">
                   <p className={`${label} flex flex-wrap justify-between gap-x-3 gap-y-1`}>
                     <span className="whitespace-nowrap text-[#d4845a]">
-                      0{index + 1} · {proof.org.toLowerCase()}
+                      0{index + 1} · {result.org}
                     </span>
-                    <span className="whitespace-nowrap">{proof.when}</span>
+                    <span className="whitespace-nowrap">{result.when}</span>
                   </p>
                   <p className="mt-3 text-[3.5rem] leading-none text-[#f6f1e7]" style={serif}>
-                    {proof.stat}
+                    {result.stat}
                   </p>
-                  <p className="mt-1 text-[15px] text-[#a39e93]">{proof.unit}</p>
-                  <p className="mt-3 text-[16px] leading-relaxed text-[#c9c2b5]">{proof.line}</p>
+                  <p className="mt-1 text-[15px] text-[#a39e93]">{result.unit}</p>
+                  <p className="mt-3 text-[16px] leading-relaxed text-[#c9c2b5]">{result.line}</p>
+                  <FieldNote className="mt-4">{result.note}</FieldNote>
+                  <Link href={`/work/${result.slug}`} className={`${boxSecondary} mt-5 self-start`}>
+                    read the full story →
+                  </Link>
                 </article>
               ))}
             </div>
-            <Link href="/work/lexsy" className={`${boxSecondary} mt-4`}>
-              read the lexsy story →
-            </Link>
           </section>
 
           {/* Projects */}
@@ -262,7 +291,13 @@ export default function Home() {
             </h2>
             <div className="mt-5 grid gap-8 md:grid-cols-2">
               {doors.map((door) => (
-                <a key={door.name} href={door.href} target="_blank" rel="noreferrer" className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d4845a]">
+                <a
+                  key={door.name}
+                  href={door.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d4845a]"
+                >
                   <span className="block aspect-[16/10] overflow-hidden border border-[#2a2622] bg-[#16140f]">
                     <img
                       src={door.image}
@@ -289,10 +324,10 @@ export default function Home() {
             <Closing education onLinkedIn={onLinkedIn} onCalendly={onCalendly} />
           </div>
 
-          <footer className={`${label} mt-14 flex flex-wrap justify-between gap-3 border-t border-[#2a2622] pt-5`}>
+          <footer className={`${label} mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-[#2a2622] pt-5`}>
             <span>vishwanth.dev</span>
             <button type="button" onClick={() => changeView("agent")} className="min-h-[44px] underline underline-offset-4 hover:text-[#f3efe6]">
-              view as agent
+              read it as your ai would
             </button>
           </footer>
         </main>

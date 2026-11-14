@@ -128,3 +128,90 @@ export const doors = [
     fit: "contain",
   },
 ];
+
+/* ------------------------------------------------------------------ home page */
+
+/** The hook, in three voices. Retone cycles through them; the first is the default. */
+export const voices = [
+  {
+    id: "precise",
+    label: "precise",
+    line: "I sit with the people doing the work.",
+    rest: "Then I ship the system.",
+    body: "I'm a forward-deployed engineer. I learn a workflow from the people who live it, then build software they actually use, in production.",
+  },
+  {
+    id: "bold",
+    label: "bold",
+    line: "Messy workflow in.",
+    rest: "Production software out.",
+    body: "Bring me the problem nobody has written down yet.",
+  },
+  {
+    id: "human",
+    label: "human",
+    line: "I learn the job",
+    rest: "before I build for it.",
+    body: "Most of my best ideas come from watching someone work around a tool.",
+  },
+] as const;
+
+export const hookShort = { line: "I listen.", rest: "Then I ship." } as const;
+
+export const hookExpanded =
+  "At Lexsy I sat with lawyers and founders and built the agent platform they use. At UMBC, the pantry staff knew the constraints; the system now handles about 3,000 requests a day. At Polycom, pages load 35% faster. Same method each time: listen first, ship second.";
+
+/** How I work: the method, with where each step showed up. */
+export const method = [
+  {
+    step: "sit with the people",
+    body: "I start where the work happens, next to the people doing it, before anything is written down.",
+    seen: "lexsy · umbc",
+  },
+  {
+    step: "map the real workflow",
+    body: "What actually happens, who signs off, where it breaks. The spec comes out of that, not the other way around.",
+    seen: "lexsy · polycom",
+  },
+  {
+    step: "ship to production",
+    body: "Real users, real data, and a person approving where it matters.",
+    seen: "lexsy · umbc",
+  },
+  {
+    step: "measure it",
+    body: "If it didn't get faster or simpler for the people using it, it isn't done.",
+    seen: "umbc · polycom",
+  },
+] as const;
+
+/** Proof: one result per place, each with a field note and its full story. */
+export const results = [
+  {
+    slug: "lexsy",
+    org: "lexsy.ai",
+    when: "2025 — now",
+    stat: "20",
+    unit: "MCP tools in production",
+    line: "A multi-agent platform with CTO, COO, and Growth agents. LexsyScan reads a client's data room and answers with sources.",
+    note: "none of it arrived as a clean spec",
+  },
+  {
+    slug: "umbc",
+    org: "umbc pantry",
+    when: "2023 — 2025",
+    stat: "3,000",
+    unit: "requests a day",
+    line: "Reservations and inventory for a campus pantry. Error rate under 1%. API latency from 450 ms to 180 ms.",
+    note: "the staff already knew the constraints",
+  },
+  {
+    slug: "polycom",
+    org: "polycom",
+    when: "2022 — 2024",
+    stat: "35%",
+    unit: "faster pages",
+    line: "Scheduling, reporting, and structured records. A BERT classifier cut repetitive manual review by 22%.",
+    note: "the pages got out of the way",
+  },
+] as const;
