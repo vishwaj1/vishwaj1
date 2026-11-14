@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link } from "wouter";
+import { FaLinkedinIn } from "react-icons/fa";
+import { ContactButton } from "./ui";
 import photoSmall from "@/assets/profile-sm.jpg";
 import { person } from "./copy";
 import { formatCardNumber, genericQuestion, parseCardNumber, questionForCard } from "./cards";
@@ -20,17 +22,17 @@ import {
   type WallEntry,
 } from "./hi-data";
 
-const display = { fontFamily: '"Newsreader", "Iowan Old Style", Georgia, serif' } as const;
-const sans = { fontFamily: '"Plus Jakarta Sans", "Helvetica Neue", sans-serif' } as const;
+const display = { fontFamily: '"Instrument Serif", "Iowan Old Style", Georgia, serif' } as const;
+const sans = { fontFamily: '"Outfit", system-ui, sans-serif' } as const;
 
 const SITE_ORIGIN = "https://vishwanth.dev";
 
-// Small tracked uppercase label, same treatment as "SCROLL THE ROOM" on the homepage.
-const label = "text-[11px] uppercase tracking-[0.22em]";
+// Small lowercase monospace label, same treatment as the home page.
+const label = "font-['IBM_Plex_Mono',ui-monospace,monospace] text-[12px] lowercase tracking-[0.06em]";
 const field =
-  "mt-2 block w-full rounded-none border border-white/20 bg-transparent px-4 py-3 text-base text-[#f3eee6] placeholder:text-[#f3eee6]/40 focus:border-[#f3eee6] focus:outline-none";
+  "mt-2 block w-full rounded-none border border-white/20 bg-transparent px-4 py-3 text-base text-[#f3efe6] placeholder:text-[#f3efe6]/40 focus:border-[#f3efe6] focus:outline-none";
 const outlined =
-  "flex min-h-[52px] w-full items-center justify-center border border-white/25 px-4 py-3 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]";
+  "flex min-h-[52px] w-full items-center justify-center border border-white/25 px-4 py-3 text-[12px] lowercase font-['IBM_Plex_Mono',ui-monospace,monospace] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d4845a]";
 
 /** Counts 0 -> `to` once, briefly. Static when reduced motion is on. */
 function CountUp({ to, reduced, render }: { to: number; reduced: boolean; render: (n: number) => string }) {
@@ -301,16 +303,16 @@ export default function Hi({ params }: { params?: { n?: string } }) {
   });
 
   const textLink =
-    "inline-flex min-h-[44px] items-center text-[12px] uppercase tracking-[0.16em] underline underline-offset-4 opacity-80 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]";
+    "inline-flex min-h-[44px] items-center text-[13px] lowercase font-['IBM_Plex_Mono',ui-monospace,monospace] underline underline-offset-4 opacity-80 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d4845a]";
   const chipClass =
-    "min-h-[56px] w-full border px-4 py-3 text-left text-lg leading-snug transition-colors duration-150 active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a] disabled:opacity-60";
+    "min-h-[56px] w-full border px-4 py-3 text-left text-[1.3rem] leading-tight transition-colors duration-150 active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d4845a] disabled:opacity-60";
   const connectLink =
-    "flex min-h-[52px] w-full items-center justify-center bg-[#e2a15a] px-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#1c1917] active:bg-[#efb56e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3eee6]";
+    "flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#d4845a] px-4 text-[13px] font-medium lowercase font-['IBM_Plex_Mono',ui-monospace,monospace] text-[#1a120b] active:bg-[#e0956b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3efe6]";
   const onLinkedIn = () => track("linkedin_clicked", { card: cardLabel });
   const showAnswered = Boolean(mine) && !editing;
 
   return (
-    <div style={{ ...sans, color: "#f3eee6" }} className="min-h-[100svh] overflow-x-clip bg-[#13110f]">
+    <div style={{ ...sans, color: "#f3efe6" }} className="min-h-[100svh] overflow-x-clip bg-[#0c0b09]">
       <main className="mx-auto w-full max-w-[640px] px-[max(1.25rem,env(safe-area-inset-left))] pb-[calc(7rem+env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-12">
         {/* Who is this from: one quiet line, enough context for a secondhand card */}
         <motion.header {...fade(0)} className="flex items-center gap-3 text-[13px] leading-5">
@@ -335,7 +337,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
               <p className={`${label} opacity-70`}>Card no.</p>
               <p
                 aria-label={`Card number ${cardLabel}`}
-                className="mt-3 text-[clamp(3.5rem,min(22vw,9.5svh),7.5rem)] leading-[1] tracking-[-0.03em] text-[#f3eee6]/40 sm:text-[7.5rem]"
+                className="mt-3 text-[clamp(3.5rem,min(22vw,9.5svh),7.5rem)] leading-[1] tracking-[-0.03em] text-[#f3efe6]/40 sm:text-[7.5rem]"
                 style={display}
               >
                 {cardLabel}
@@ -349,7 +351,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
               {scan && <CountUp to={scan.count} reduced={reduced} render={(n) => scanCopy(scan, n)} />}
             </p>
           )}
-          <h1 id="card-q" className="mt-4 text-[1.875rem] font-medium leading-[1.1] tracking-[-0.01em] text-[#f3eee6] sm:text-5xl" style={display}>
+          <h1 id="card-q" className="mt-4 text-[2.125rem] leading-[1.05] tracking-[-0.01em] text-[#f6f1e7] sm:text-5xl" style={display}>
             {question.text}
           </h1>
         </motion.section>
@@ -363,7 +365,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                 initial={reduced ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
-                className="border border-[#f3eee6] px-4 py-5"
+                className="border border-[#f3efe6] px-4 py-5"
               >
                 <div role="status">
                   <p className="text-2xl leading-snug" style={display}>
@@ -401,7 +403,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                             disabled={busy !== null}
                             aria-pressed={current || undefined}
                             onClick={() => void send(chip, "chip_answer")}
-                            className={`${chipClass} ${busy === chip || current ? "border-[#f3eee6] bg-white/15" : "border-white/35 bg-white/[0.06]"}`}
+                            className={`${chipClass} ${busy === chip || current ? "border-[#f3efe6] bg-white/15" : "border-white/35 bg-white/[0.06]"}`}
                             style={display}
                           >
                             {chip}
@@ -495,7 +497,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                         <button
                           type="submit"
                           disabled={busy !== null || !custom.trim()}
-                          className="min-h-[52px] w-full bg-[#f3eee6] px-6 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#13110f] active:bg-white disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e2a15a]"
+                          className="min-h-[52px] w-full bg-[#f3efe6] px-6 py-3 text-[13px] font-medium lowercase font-['IBM_Plex_Mono',ui-monospace,monospace] text-[#0c0b09] active:bg-white disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4845a]"
                         >
                           {busy ? "Sending…" : mine ? "Save" : "Send"}
                         </button>
@@ -503,7 +505,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                           type="button"
                           onClick={closeCustom}
                           disabled={busy !== null}
-                          className="min-h-[52px] border border-white/25 px-5 text-[12px] uppercase tracking-[0.16em] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e2a15a]"
+                          className="min-h-[52px] border border-white/25 px-5 text-[12px] lowercase font-['IBM_Plex_Mono',ui-monospace,monospace] active:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d4845a]"
                         >
                           Cancel
                         </button>
@@ -522,7 +524,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
 
                 {error && (
                   <div role="alert" className="mt-3 text-base leading-snug">
-                    <p style={display}>{error}</p>
+                    <p>{error}</p>
                     <a href={mailto(custom)} className={`${textLink} mt-1`}>
                       Or email your answer
                     </a>
@@ -558,7 +560,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                 {person.line}
               </p>
               <a href={person.linkedin} target="_blank" rel="noreferrer" onClick={onLinkedIn} className={`${connectLink} mt-4`}>
-                Connect on LinkedIn
+                <FaLinkedinIn className="h-4 w-4" aria-hidden /> connect on linkedin ↗
               </a>
             </motion.div>
           )}
@@ -580,7 +582,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                 <ul className="mt-3 divide-y divide-white/10">
                   {wall.map((entry, index) => (
                     <li key={`${entry.created_at}-${index}`} className="py-4">
-                      <p className="break-words text-xl leading-snug" style={display}>
+                      <p className="break-words text-[1.375rem] leading-snug" style={display}>
                         {entry.answer}
                       </p>
                       {(entry.first_name || entry.city) && (
@@ -599,7 +601,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
         {/* Spread */}
         <section className="mt-12 border-t border-white/15 pt-6" aria-label="Pass it on">
           <p className={`${label} opacity-60`}>Pass it on</p>
-          <p className="mt-3 text-xl leading-snug" style={display}>
+          <p className="mt-3 text-[1.5rem] leading-[1.2]" style={display}>
             Know someone building something hard? Send them this.
           </p>
           <button type="button" onClick={onShare} className={`${outlined} mt-4`}>
@@ -621,7 +623,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
           <dl className="mt-6 space-y-5">
             <div>
               <dt className={`${label} opacity-60`}>Now</dt>
-              <dd className="mt-1 text-xl leading-snug" style={display}>
+              <dd className="mt-1 text-[17px] leading-relaxed text-[#c9c2b5]">
                 <span className="block">On the founding engineering team at Lexsy, embedded with lawyers and founders.</span>
                 <span className="mt-3 block opacity-80">
                   Their work never arrives as a clean spec, so I sit in on incorporations, fundraising and cap tables, then build the system: about twenty tools, three AI agents, and a person who still approves.
@@ -630,7 +632,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
             </div>
             <div>
               <dt className={`${label} opacity-60`}>Looking for</dt>
-              <dd className="mt-1 text-xl leading-snug" style={display}>
+              <dd className="mt-1 text-[17px] leading-relaxed text-[#c9c2b5]">
                 Forward-deployed or product engineering roles, on a team where engineers sit close to the people using what they build.
               </dd>
             </div>
@@ -640,26 +642,12 @@ export default function Hi({ params }: { params?: { n?: string } }) {
           </Link>
         </section>
 
-        {/* Quiet links */}
-        <nav className="mt-10 flex flex-wrap gap-x-6" aria-label="More ways to reach me">
-          <a
-            className={textLink}
-            href={person.calendly}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => track("calendly_clicked", { card: cardLabel })}
-          >
-            Book a call
-          </a>
-          <a className={textLink} href={person.resume} target="_blank" rel="noreferrer">
-            Resume
-          </a>
-          <a className={textLink} href={`mailto:${person.email}`}>
-            Email
-          </a>
-          <a className={textLink} href={person.github} target="_blank" rel="noreferrer">
-            GitHub
-          </a>
+        {/* Other ways to reach me, each with its logo */}
+        <nav className="mt-10 grid grid-cols-2 gap-2" aria-label="More ways to reach me">
+          <ContactButton kind="calendly" className="justify-start" onClick={() => track("calendly_clicked", { card: cardLabel })} />
+          <ContactButton kind="resume" className="justify-start" />
+          <ContactButton kind="email" className="justify-start" />
+          <ContactButton kind="github" className="justify-start" />
         </nav>
 
         {/* TODO: "where this card has been" travel map. The scans table is ready for it
@@ -681,7 +669,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
             animate={{ y: 0 }}
             exit={reduced ? { opacity: 0 } : { y: "100%" }}
             transition={{ duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#13110f]/95 px-[max(1.25rem,env(safe-area-inset-left))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur"
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#0c0b09]/95 px-[max(1.25rem,env(safe-area-inset-left))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur"
           >
             <a
               href={person.linkedin}
@@ -690,7 +678,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
               onClick={onLinkedIn}
               className={`${connectLink} mx-auto max-w-[640px]`}
             >
-              Connect on LinkedIn
+              <FaLinkedinIn className="h-4 w-4" aria-hidden /> connect on linkedin ↗
             </a>
           </motion.div>
         )}
