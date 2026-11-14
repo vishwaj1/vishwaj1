@@ -58,7 +58,7 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-24 px-6 bg-secondary/20" ref={ref}>
+    <section id="contact" className="py-24 px-6 bg-secondary/20 overflow-x-clip" ref={ref}>
       <div className="container mx-auto max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
