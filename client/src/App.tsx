@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import Themes from "@/pages/themes";
 import NotFound from "@/pages/not-found";
 import Walk, { CasePage } from "@/site/walk";
+import Hi from "@/site/hi";
 import { routerBase } from "@/lib/router-base";
 
 function WorkRoute({ params }: { params?: { slug?: string } }) {
@@ -20,6 +21,8 @@ function AppRoutes() {
       {import.meta.env.DEV && (
         <Route path="/vishwaj1/work/:slug" component={WorkRoute} />
       )}
+      <Route path="/hi/:n" component={Hi} />
+      <Route path="/hi" component={Hi} />
       <Route path="/themes" component={Themes} />
       <Route path="/classic" component={Home} />
       <Route path="/" component={Walk} />
