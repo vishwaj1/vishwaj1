@@ -616,19 +616,22 @@ export default function Hi({ params }: { params?: { n?: string } }) {
         <section className="mt-12 border-t border-white/15 pt-6" aria-label="Who I am">
           <p className={`${label} opacity-60`}>Who I am</p>
           <p className="mt-4 text-[1.5rem] leading-[1.2]" style={display}>
-            I'm a software engineer who works as a forward-deployed engineer, embedded with the people doing the work.
+            I'm a software engineer. I start by watching how people actually get their work done.
           </p>
           <dl className="mt-6 space-y-5">
             <div>
               <dt className={`${label} opacity-60`}>Now</dt>
               <dd className="mt-1 text-xl leading-snug" style={display}>
-                Founding engineering team at Lexsy. Building an internal multi-agent platform alongside lawyers and founders.
+                <span className="block">On the founding engineering team at Lexsy, embedded with lawyers and founders.</span>
+                <span className="mt-3 block opacity-80">
+                  Their work never arrives as a clean spec, so I sit in on incorporations, fundraising and cap tables, then build the system: about twenty tools, three AI agents, and a person who still approves.
+                </span>
               </dd>
             </div>
             <div>
               <dt className={`${label} opacity-60`}>Looking for</dt>
               <dd className="mt-1 text-xl leading-snug" style={display}>
-                Forward-deployed and product engineering roles, where engineers work next to the people using the thing.
+                Forward-deployed or product engineering roles, on a team where engineers sit close to the people using what they build.
               </dd>
             </div>
           </dl>
