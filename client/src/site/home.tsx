@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "wouter";
 import { Copy } from "lucide-react";
 import { doors, hookExpanded, hookShort, method, person, results, voices } from "./copy";
@@ -107,8 +107,11 @@ export default function Home() {
     transition: { duration: 0.25, delay: reduced ? 0 : delay, ease: [0.22, 1, 0.36, 1] as const },
   });
 
-  const headline = mode === "short" ? hookShort : mode === "expand" ? voices[0] : voice;
-  const body = mode === "short" ? null : mode === "expand" ? hookExpanded : voice.body;
+  // All versions are rendered at once (stacked); only the active one is visible.
+  const headlines = [...voices.map((v) => ({ key: v.id as string, line: v.line, rest: v.rest })), { key: "short", ...hookShort }];
+  const activeHead = mode === "short" ? "short" : mode === "expand" ? voices[0].id : voice.id;
+  const bodies = [...voices.map((v) => ({ key: v.id as string, text: v.body as string })), { key: "expand", text: hookExpanded }];
+  const activeBody = mode === "short" ? null : mode === "expand" ? "expand" : voice.id;
 
   return (
     <div style={{ ...sans, color: "#f3efe6" }} className="min-h-[100svh] overflow-x-clip bg-[#0c0b09]">
@@ -171,41 +174,50 @@ export default function Home() {
                 <p className={`${label} mt-1 text-[13px]`}>forward-deployed engineer</p>
               </motion.div>
 
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.p
-                  key={`${mode}-${headline.line}`}
-                  initial={reduced ? false : { opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduced ? undefined : { opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
-                  className="mt-7 max-w-3xl text-[clamp(2.75rem,11.5vw,5.4rem)] leading-[0.95] tracking-[-0.01em] text-[#f6f1e7] sm:text-[clamp(2.75rem,6.6vw,5.4rem)]"
-                  style={serif}
-                >
-                  {headline.line} <i className="text-[#d4845a]">{headline.rest}</i>
-                </motion.p>
-              </AnimatePresence>
-              <div className="mt-6 h-px w-14 bg-[#d4845a]" />
-              <AnimatePresence mode="wait" initial={false}>
-                {body && (
-                  <motion.p
-                    key={mode === "expand" ? "expand" : voice.id}
-                    initial={reduced ? false : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={reduced ? undefined : { opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="mt-5 max-w-xl text-[17px] leading-relaxed text-[#c9c2b5] sm:text-lg"
+              {/* Every version of the hook sits in the same grid cell, so the block is always as tall
+                  as the longest one and nothing below it moves when you rewrite. */}
+              <div className="mt-7 grid max-w-3xl">
+                {headlines.map((h) => (
+                  <p
+                    key={h.key}
+                    aria-hidden={h.key !== activeHead}
+                    className={`[grid-area:1/1] text-[clamp(2.75rem,11.5vw,5.4rem)] leading-[0.95] tracking-[-0.01em] text-[#f6f1e7] transition-opacity duration-200 motion-reduce:transition-none sm:text-[clamp(2.75rem,6.6vw,5.4rem)] ${
+                      h.key === activeHead ? "opacity-100" : "pointer-events-none select-none opacity-0"
+                    }`}
+                    style={serif}
                   >
-                    {body}
-                  </motion.p>
-                )}
-              </AnimatePresence>
+                    {h.line} <i className="text-[#d4845a]">{h.rest}</i>
+                  </p>
+                ))}
+              </div>
+              <div className="mt-6 h-px w-14 bg-[#d4845a]" />
+              <div className="mt-5 grid max-w-xl">
+                {bodies.map((b) => (
+                  <p
+                    key={b.key}
+                    aria-hidden={b.key !== activeBody}
+                    className={`[grid-area:1/1] text-[17px] leading-relaxed text-[#c9c2b5] transition-opacity duration-200 motion-reduce:transition-none sm:text-lg ${
+                      b.key === activeBody ? "opacity-100" : "pointer-events-none select-none opacity-0"
+                    }`}
+                  >
+                    {b.text}
+                  </p>
+                ))}
+              </div>
 
               <div className="mt-6 flex flex-wrap gap-1.5" role="group" aria-label="Rewrite this introduction">
                 <button type="button" onClick={() => setMode("short")} className={mode === "short" ? boxActive : boxSecondary} aria-pressed={mode === "short"}>
                   shorten
                 </button>
                 <button type="button" onClick={retone} className={mode === "voice" ? boxActive : boxSecondary} aria-pressed={mode === "voice"}>
-                  retone · {voice.label}
+                  {/* All labels share one cell, so the button keeps the width of the longest and "expand" never shifts. */}
+                  <span className="grid">
+                    {voices.map((v) => (
+                      <span key={v.id} aria-hidden={v.id !== voice.id} className={`[grid-area:1/1] ${v.id === voice.id ? "" : "invisible"}`}>
+                        retone · {v.label}
+                      </span>
+                    ))}
+                  </span>
                 </button>
                 <button type="button" onClick={() => setMode("expand")} className={mode === "expand" ? boxActive : boxSecondary} aria-pressed={mode === "expand"}>
                   expand

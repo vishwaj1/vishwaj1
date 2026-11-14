@@ -159,7 +159,7 @@ export const voices = [
 export const hookShort = { line: "I listen.", rest: "Then I ship." } as const;
 
 export const hookExpanded =
-  "At Lexsy I sat with lawyers and founders and built the agent platform they use. At UMBC, the pantry staff knew the constraints; the system now handles about 3,000 requests a day. At Polycom, pages load 35% faster. Same method each time: listen first, ship second.";
+  "At Lexsy, I sat with lawyers and founders and built the agent platform they use. At UMBC, the pantry staff knew the constraints; it now handles 3,000 requests a day. At Polycom, pages got 35% faster. Listen first, ship second.";
 
 /** How I work: the method, with where each step showed up. */
 export const method = [
