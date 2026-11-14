@@ -1,0 +1,26 @@
+-- Rewrite my answers in my own voice; all verified.
+update public.card_content set mine='How fast people open up when you ask them something real. Like this card, hopefully.', needs_verify=false where question_id='surprised';
+update public.card_content set mine='Saying no. I like helping a little too much. How do you do it?', needs_verify=false where question_id='hardest-problem';
+update public.card_content set mine='Badminton. Three hours gone, phone untouched. Do you play?', needs_verify=false where question_id='lost-time';
+update public.card_content set mine='A long badminton session after a bad day. Works every time.', needs_verify=false where question_id='small-improvement';
+update public.card_content set mine='Something small that people actually use. Got an idea? I''m listening.', needs_verify=false where question_id='free-week';
+update public.card_content set mine='That AI models have real opinions. They''re just very good at sounding like they do.', needs_verify=false where question_id='overrated';
+update public.card_content set mine='Dancing. I''d be bad at it for months and enjoy every one of them.', needs_verify=false where question_id='skill-if-free';
+update public.card_content set mine='Long drives. Give me eight hours of open road and I''m happy. Best road trip you''ve done?', needs_verify=false where question_id='unreasonably-good';
+update public.card_content set mine='Still figuring that out. Ask me again in a month.', needs_verify=false where question_id='cant-stop';
+update public.card_content set mine='Movies and podcasts. Send me your last good one and I''ll trade you mine.', needs_verify=false where question_id='curious-outside-work';
+update public.card_content set mine='Getting good at a sport. No shortcuts, just reps.', needs_verify=false where question_id='worth-slowly';
+update public.card_content set mine='Nothing lately. Everything I make lives on a screen. Teach me something?', needs_verify=false where question_id='made-by-hand';
+update public.card_content set mine='That it''s all coding. Most of it is figuring out what people actually need.', needs_verify=false where question_id='job-misunderstood';
+update public.card_content set mine='Everyone who beat me at badminton. Losing teaches you fast.', needs_verify=false where question_id='taught-me-most';
+update public.card_content set mine='A few side projects. Each one taught me what the next one needed.', needs_verify=false where question_id='nobody-uses';
+update public.card_content set mine='Ask for help early. Nobody thinks less of you for it.', needs_verify=false where question_id='five-years-ago';
+update public.card_content set mine='Scheduling. Five people shouldn''t need five emails to find one hour.', needs_verify=false where question_id='automate-forever';
+update public.card_content set mine='That busy means productive. It usually doesn''t.', needs_verify=false where question_id='changed-mind';
+update public.card_content set mine='Starting conversations. Keeping them going is next, and this card is practice.', needs_verify=false where question_id='better-than-last-year';
+update public.card_content set mine='Being the one who always showed up to help.', needs_verify=false where question_id='remembered-for';
+update public.card_content set mine='Building something of my own. It''ll take a lot of tries. I''m in.', needs_verify=false where question_id='decade-problem';
+update public.card_content set mine='Take time to figure out what I actually want, not just what comes next.', needs_verify=false where question_id='if-nobody-judged';
+update public.card_content set mine='"Slow down." I still go past my limit every game.', needs_verify=false where question_id='ignored-advice';
+update public.card_content set mine='Saying yes to everything isn''t the same as being helpful.', needs_verify=false where question_id='bad-job';
+update public.card_content set mine='Find the thing I really want to build. If you''re building something too, let''s talk.', needs_verify=false where question_id='this-year';
