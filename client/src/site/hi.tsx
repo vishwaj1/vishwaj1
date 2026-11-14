@@ -335,7 +335,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
               <p className={`${label} opacity-70`}>Card no.</p>
               <p
                 aria-label={`Card number ${cardLabel}`}
-                className="mt-1 text-[clamp(3.5rem,min(22vw,11svh),7.5rem)] leading-[0.9] tracking-[-0.03em] sm:text-[7.5rem]"
+                className="mt-3 text-[clamp(3.5rem,min(22vw,9.5svh),7.5rem)] leading-[1] tracking-[-0.03em] text-[#f3eee6]/40 sm:text-[7.5rem]"
                 style={display}
               >
                 {cardLabel}
@@ -349,7 +349,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
               {scan && <CountUp to={scan.count} reduced={reduced} render={(n) => scanCopy(scan, n)} />}
             </p>
           )}
-          <h1 id="card-q" className="mt-3 text-[1.875rem] leading-[1.1] tracking-[-0.01em] sm:text-5xl" style={display}>
+          <h1 id="card-q" className="mt-4 text-[1.875rem] font-medium leading-[1.1] tracking-[-0.01em] text-[#f3eee6] sm:text-5xl" style={display}>
             {question.text}
           </h1>
         </motion.section>
@@ -401,7 +401,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                             disabled={busy !== null}
                             aria-pressed={current || undefined}
                             onClick={() => void send(chip, "chip_answer")}
-                            className={`${chipClass} ${busy === chip || current ? "border-[#f3eee6] bg-white/10" : "border-white/25"}`}
+                            className={`${chipClass} ${busy === chip || current ? "border-[#f3eee6] bg-white/15" : "border-white/35 bg-white/[0.06]"}`}
                             style={display}
                           >
                             {chip}
@@ -409,7 +409,7 @@ export default function Hi({ params }: { params?: { n?: string } }) {
                             {current && busy !== chip && <span className={`ml-3 ${label} opacity-70`}>Your answer</span>}
                           </button>
                         ) : (
-                          <a href={mailto(chip)} className={`${chipClass} flex items-center border-white/25`} style={display}>
+                          <a href={mailto(chip)} className={`${chipClass} flex items-center border-white/35 bg-white/[0.06]`} style={display}>
                             {chip}
                           </a>
                         )}
